@@ -1,0 +1,11 @@
+services:
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: pr-commentator-img
+    container_name: pr-commentator
+    volumes:
+      - ./app:/app
+    tty: true
+    stdin_open: true
