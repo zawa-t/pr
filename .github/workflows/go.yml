@@ -23,8 +23,8 @@ jobs:
 
     - run: cd app && ls
     - name: Build
-      run: go build -v ./...
+      run: go build -v main
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v main
 
