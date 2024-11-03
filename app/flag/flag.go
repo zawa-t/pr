@@ -25,11 +25,10 @@ type Value struct {
 }
 
 func NewValue() (value *Value) {
-	// required
 	var name string
 	nameFlags := []string{"n", "name"}
 	for _, f := range nameFlags {
-		flag.StringVar(&name, f, "", "linter tool name. The flag is required.")
+		flag.StringVar(&name, f, "", "tool name. The flag is required.")
 	}
 
 	var fileExtension string
@@ -41,7 +40,6 @@ func NewValue() (value *Value) {
 	var platform string
 	flag.StringVar(&platform, "platform", "", "The flag is optional.")
 
-	// optional
 	var customTextFormat string
 	customTextFormatFlags := []string{"cus", "custom-text-format"}
 	for _, f := range customTextFormatFlags {

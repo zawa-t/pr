@@ -7,14 +7,14 @@ import (
 
 	"github.com/zawa-t/pr-commentator/env"
 	"github.com/zawa-t/pr-commentator/flag"
-	"github.com/zawa-t/pr-commentator/golangci"
+	"github.com/zawa-t/pr-commentator/linter/golangci"
+	"github.com/zawa-t/pr-commentator/linter/txt"
 	"github.com/zawa-t/pr-commentator/log"
 	"github.com/zawa-t/pr-commentator/platform"
 	"github.com/zawa-t/pr-commentator/platform/bitbucket"
 	"github.com/zawa-t/pr-commentator/platform/bitbucket/client"
 	"github.com/zawa-t/pr-commentator/platform/http"
 	"github.com/zawa-t/pr-commentator/test/custommock"
-	"github.com/zawa-t/pr-commentator/txt"
 )
 
 /*
@@ -57,22 +57,21 @@ func main() {
 		input.Datas = txt.Read(*flagValue, stdin)
 	}
 
-	slog.Info("The following data was accepted.")
-	log.PrintJSON(input)
+	log.PrintJSON("platform.Input", input)
 
-	var p *platform.Platform
+	var pf *platform.Platform
 	switch flagValue.Platform {
 	case platform.Bitbucket:
 		if env.Env.IsLocal() {
-			p = platform.New(bitbucket.NewPullRequest(custommock.DefaultCustomClient))
+			pf = platform.New(bitbucket.NewPullRequest(custommock.DefaultCustomClient))
 		} else {
-			p = platform.New(bitbucket.NewPullRequest(client.NewCustomClient(http.NewClient())))
+			pf = platform.New(bitbucket.NewPullRequest(client.NewCustomClient(http.NewClient())))
 		}
 	case platform.Github:
 		// TODO: 処理追加
 	}
 
-	if err := p.PullRequest.AddComments(context.Background(), input); err != nil {
+	if err := pf.PullRequest.AddComments(context.Background(), input); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}

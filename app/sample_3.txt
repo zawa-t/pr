@@ -1,0 +1,4 @@
+main.go:3: exported var V should have comment or be unexported
+main.go:5: exported var NewError1 should have comment or be unexported
+main.go:7: comment on exported function F should be of the form "F ..."
+main.go:11: comment on exported function F2 should be of the form "F2 ..."

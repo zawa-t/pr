@@ -1,2 +1,0 @@
-/main.go:28:txt test
-/main.go:31:txt testtest

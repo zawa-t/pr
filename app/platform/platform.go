@@ -20,7 +20,7 @@ type PullRequest interface {
 
 // Input ...
 type Input struct {
-	Name  string // nameが指定されていない場合はLinterを設定？
+	Name  string
 	Datas []Data
 }
 
@@ -31,7 +31,7 @@ type Data struct {
 	LineNum           uint
 	Summary           string
 	Details           string
-	CustomCommentText *string
+	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
 }
 
 var ErrNotFound = errors.New("not found")

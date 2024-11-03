@@ -5,20 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"os"
 )
 
-func PrintJSON(v any) {
+func PrintJSON(name string, v any) {
 	data, err := json.Marshal(v)
 	if err != nil {
 		slog.Error("Faild to exec json.Marshal().", "error", err.Error())
-		os.Exit(1)
 	}
 	var buf bytes.Buffer
 	err = json.Indent(&buf, data, "", "  ")
 	if err != nil {
 		slog.Error("Faild to exec json.Indent().", "error", err.Error())
-		os.Exit(1)
 	}
+	slog.Info(fmt.Sprintf("The data was binded to a struct (%s).", name)) // TODO: 最終的にはDebugログにしたい
 	fmt.Println(buf.String())
 }
