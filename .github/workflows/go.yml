@@ -36,14 +36,13 @@ jobs:
 
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v4
+        working-directory: ./app
         with:
           version: latest # 必要に応じて特定のバージョンを指定
 
       - name: Run golangci-lint
-        run: |
-          pushd ./app
-          golangci-lint run ./...
-          popd
+        working-directory: ./app
+        run: golangci-lint run main.go # サブディレクトリも含めてリントを実行
 
       - name: Build
         run: go build -v ./...
