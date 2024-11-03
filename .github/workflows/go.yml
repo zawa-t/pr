@@ -41,7 +41,6 @@ jobs:
           GOBIN: $(go env GOPATH)/bin
 
       - name: Run golangci-lint
-        working-directory: ./app
         run: $(go env GOPATH)/bin/golangci-lint run ./...
 
       # - name: Install golangci-lint
