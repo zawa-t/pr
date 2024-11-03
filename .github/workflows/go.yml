@@ -2,7 +2,7 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
 name: Go
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+
 on:
   push:
     branches: [ "main" ]
@@ -18,7 +18,7 @@ jobs:
         working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
-      - name: Start up Message 
+      - name: Start Message 
         working-directory: "/" # このステップのみルートディレクトリで実行
         run: |
           echo "The job was automatically triggered by a ${{ github.event_name }} event."
