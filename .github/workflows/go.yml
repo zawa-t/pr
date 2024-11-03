@@ -18,7 +18,7 @@ jobs:
         working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
-      - name: Common Message 
+      - name: Start up Message 
         working-directory: "/" # このステップのみルートディレクトリで実行
         run: |
           echo "The job was automatically triggered by a ${{ github.event_name }} event."
@@ -35,10 +35,8 @@ jobs:
           go-version: '1.22.8'
 
       - name: Build
-        working-directory: ./app
         run: go build -v ./...
 
       - name: Test
-        working-directory: ./app
         run: go test -v ./...
 
