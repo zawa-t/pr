@@ -39,8 +39,12 @@ jobs:
         with:
           version: latest # 必要に応じて特定のバージョンを指定
 
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+
       - name: Run golangci-lint
-        run: golangci-lint run # サブディレクトリも含めてリントを実行
+        run: golangci-lint run ./... # サブディレクトリも含めてリントを実行
 
       - name: Build
         run: go build -v ./...
