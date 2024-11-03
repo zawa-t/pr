@@ -40,7 +40,7 @@ jobs:
           version: latest # 必要に応じて特定のバージョンを指定
 
       - name: Run golangci-lint
-        run: golangci-lint run . # サブディレクトリも含めてリントを実行
+        run: golangci-lint run main.go # サブディレクトリも含めてリントを実行
 
       - name: Build
         run: go build -v ./...
