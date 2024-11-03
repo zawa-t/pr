@@ -41,15 +41,7 @@ jobs:
           GOBIN: $(go env GOPATH)/bin
 
       - name: Run golangci-lint
-        run: $(go env GOPATH)/bin/golangci-lint run ./...
-
-      # - name: Install golangci-lint
-      #   uses: golangci/golangci-lint-action@v4
-      #   with:
-      #     version: latest # 必要に応じて特定のバージョンを指定
-
-      # - name: Run golangci-lint
-      #   run: golangci-lint run main.go # サブディレクトリも含めてリントを実行
+        run: golangci-lint run ./...
 
       - name: Build
         run: go build -v ./...
