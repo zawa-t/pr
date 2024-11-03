@@ -38,7 +38,6 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: latest # 必要に応じて特定のバージョンを指定
-        working-directory: ./app
 
       - name: Run golangci-lint
         working-directory: ./app
