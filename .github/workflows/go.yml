@@ -41,7 +41,7 @@ jobs:
           GOBIN: $(go env GOPATH)/bin
 
       - name: Run golangci-lint
-        run: golangci-lint run ./...
+        run: golangci-lint run ./... --out-format=line-number
 
       - name: Build
         run: go build -v ./...
