@@ -41,6 +41,7 @@ jobs:
 
       - name: Run golangci-lint
         run: golangci-lint --fix run ./... # サブディレクトリも含めてリントを実行
+        working-directory: ./app
 
       - name: Build
         run: go build -v ./...
