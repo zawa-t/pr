@@ -38,12 +38,13 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: latest # 必要に応じて特定のバージョンを指定
+          flags: --path-prefix ./app ./... # appディレクトリに限定してリントを実行
 
       - name: Build
         run: go build -v ./...
 
-      - name: Run golangci-lint
-        run: golangci-lint run main.go # サブディレクトリも含めてリントを実行
+      # - name: Run golangci-lint
+      #   run: golangci-lint run main.go # サブディレクトリも含めてリントを実行
 
       - name: Test
         run: go test -v ./...
