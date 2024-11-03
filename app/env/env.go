@@ -12,3 +12,15 @@ func getEnv(name string) string {
 	}
 	return v
 }
+
+var local env = "local"
+
+type env string
+
+func (e env) IsLocal() bool {
+	return e == local
+}
+
+var (
+	Env env = env(getEnv("ENV"))
+)

@@ -5,18 +5,16 @@ import (
 	"errors"
 )
 
+type Platform struct {
+	PullRequest PullRequest
+}
+
+func New(pr PullRequest) *Platform {
+	return &Platform{pr}
+}
+
 // PullRequest ...
-type PullRequest struct {
-	Comment
-}
-
-// NewPullRequest ...
-func NewPullRequest(c Comment) *PullRequest {
-	return &PullRequest{c}
-}
-
-// Comment ...
-type Comment interface {
+type PullRequest interface {
 	AddComments(ctx context.Context, data Input) error
 }
 
@@ -37,3 +35,8 @@ type Data struct {
 }
 
 var ErrNotFound = errors.New("not found")
+
+const (
+	Bitbucket = "bitbucket"
+	Github    = "github"
+)

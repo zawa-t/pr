@@ -1,15 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/zawa-t/pr-commentator/env"
 	"github.com/zawa-t/pr-commentator/flag"
 	"github.com/zawa-t/pr-commentator/golangci"
+	"github.com/zawa-t/pr-commentator/log"
 	"github.com/zawa-t/pr-commentator/platform"
 	"github.com/zawa-t/pr-commentator/platform/bitbucket"
 	"github.com/zawa-t/pr-commentator/platform/bitbucket/client"
@@ -59,37 +58,24 @@ func main() {
 	}
 
 	slog.Info("The following data was accepted.")
-	printJSON(input)
+	log.PrintJSON(input)
 
-	var comment platform.Comment
+	var p *platform.Platform
 	switch flagValue.Platform {
-	case "local":
-		customClient := custommock.DefaultCustomClient
-		comment = bitbucket.NewPullRequest(customClient) // TODO: 修正が必要
-	case "bitbucket":
-		customClient := client.NewCustomClient(http.NewClient())
-		comment = bitbucket.NewPullRequest(customClient)
+	case platform.Bitbucket:
+		if env.Env.IsLocal() {
+			p = platform.New(bitbucket.NewPullRequest(custommock.DefaultCustomClient))
+		} else {
+			p = platform.New(bitbucket.NewPullRequest(client.NewCustomClient(http.NewClient())))
+		}
+	case platform.Github:
+		// TODO: 処理追加
 	}
 
-	if err := platform.NewPullRequest(comment).AddComments(context.Background(), input); err != nil {
+	if err := p.PullRequest.AddComments(context.Background(), input); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}
 
 	slog.Info("The pull request comments were successfully added.")
-}
-
-func printJSON(v any) {
-	data, err := json.Marshal(v)
-	if err != nil {
-		slog.Error("Faild to exec json.Marshal().", "error", err.Error())
-		os.Exit(1)
-	}
-	var buf bytes.Buffer
-	err = json.Indent(&buf, data, "", "  ")
-	if err != nil {
-		slog.Error("Faild to exec json.Indent().", "error", err.Error())
-		os.Exit(1)
-	}
-	fmt.Println(buf.String())
 }

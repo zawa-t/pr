@@ -5,13 +5,23 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+
+	"github.com/zawa-t/pr-commentator/platform"
 )
 
-var usage = "Usage: reviewcat --tool-name=[linter tool name] --ext=[file extension] < inputfile"
+var usage = "Usage: pr-comment --name=[tool name] --ext=[file extension] --platform=[platform name] < inputfile"
+
+type Required struct {
+	Name, FileExtension, Platform string
+}
+
+type Optional struct {
+	CustomTextFormat, AlternativeText *string
+}
 
 type Value struct {
-	Name, FileExtension, Platform     string
-	CustomTextFormat, AlternativeText *string
+	Required
+	Optional
 }
 
 func NewValue() (value *Value) {
@@ -47,9 +57,11 @@ func NewValue() (value *Value) {
 	flag.Parse()
 
 	value = &Value{
-		Name:          name,
-		FileExtension: fileExtension,
-		Platform:      platform,
+		Required: Required{
+			Name:          name,
+			FileExtension: fileExtension,
+			Platform:      platform,
+		},
 	}
 
 	if customTextFormat != "" {
@@ -64,20 +76,21 @@ func NewValue() (value *Value) {
 	return
 }
 
-func (v *Value) validate() {
-	if v.Name == "" || v.FileExtension == "" {
+func (r *Required) validate() {
+	if r.Name == "" || r.FileExtension == "" || r.Platform == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
 
-	allowedFormats := []string{"txt", "json"}
-	if !slices.Contains(allowedFormats, v.FileExtension) {
-		slog.Error(usage)
+	allowedExtensions := []string{"txt", "json"}
+	if !slices.Contains(allowedExtensions, r.FileExtension) {
+		slog.Error("The specified extension is not supported.")
 		os.Exit(1)
 	}
 
-	if v.AlternativeText != nil && v.CustomTextFormat != nil {
-		slog.Error("Only one of AlternativeText and CustomTextFormat can be set.")
+	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
+	if !slices.Contains(allowedPlatforms, r.Platform) {
+		slog.Error("The specified platform is not supported.")
 		os.Exit(1)
 	}
 }
