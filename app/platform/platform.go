@@ -1,23 +1,24 @@
 package platform
 
 import (
+	"context"
 	"errors"
 )
 
-// // PullRequest ...
-// type PullRequest struct {
-// 	Comment
-// }
+// PullRequest ...
+type PullRequest struct {
+	Comment
+}
 
-// // NewPullRequest ...
-// func NewPullRequest(c Comment) *PullRequest {
-// 	return &PullRequest{c}
-// }
+// NewPullRequest ...
+func NewPullRequest(c Comment) *PullRequest {
+	return &PullRequest{c}
+}
 
-// // Comment ...
-// type Comment interface {
-// 	AddComments(ctx context.Context, data Input) error
-// }
+// Comment ...
+type Comment interface {
+	AddComments(ctx context.Context, data Input) error
+}
 
 // Input ...
 type Input struct {

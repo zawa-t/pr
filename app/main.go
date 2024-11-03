@@ -61,14 +61,17 @@ func main() {
 	slog.Info("The following data was accepted.")
 	printJSON(input)
 
-	var customClient bitbucket.CustomClient
-	if flagValue.Reporter != nil && *flagValue.Reporter == "local" {
-		customClient = custommock.DefaultCustomClient
-	} else {
-		customClient = client.NewCustomClient(http.NewClient())
+	var comment platform.Comment
+	switch flagValue.Platform {
+	case "local":
+		customClient := custommock.DefaultCustomClient
+		comment = bitbucket.NewPullRequest(customClient) // TODO: 修正が必要
+	case "bitbucket":
+		customClient := client.NewCustomClient(http.NewClient())
+		comment = bitbucket.NewPullRequest(customClient)
 	}
 
-	if err := bitbucket.NewPullRequest(customClient).AddComments(context.Background(), input); err != nil {
+	if err := platform.NewPullRequest(comment).AddComments(context.Background(), input); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}

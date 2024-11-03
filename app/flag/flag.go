@@ -10,8 +10,8 @@ import (
 var usage = "Usage: reviewcat --tool-name=[linter tool name] --ext=[file extension] < inputfile"
 
 type Value struct {
-	Name, FileExtension                         string
-	Reporter, CustomTextFormat, AlternativeText *string
+	Name, FileExtension, Platform     string
+	CustomTextFormat, AlternativeText *string
 }
 
 func NewValue() (value *Value) {
@@ -28,10 +28,10 @@ func NewValue() (value *Value) {
 		flag.StringVar(&fileExtension, f, "", "file extension. The flag is required.")
 	}
 
-	// optional
-	var reporter string
-	flag.StringVar(&reporter, "reporter", "", "The flag is optional.")
+	var platform string
+	flag.StringVar(&platform, "platform", "", "The flag is optional.")
 
+	// optional
 	var customTextFormat string
 	customTextFormatFlags := []string{"cus", "custom-text-format"}
 	for _, f := range customTextFormatFlags {
@@ -49,10 +49,7 @@ func NewValue() (value *Value) {
 	value = &Value{
 		Name:          name,
 		FileExtension: fileExtension,
-	}
-
-	if reporter != "" {
-		value.Reporter = &reporter
+		Platform:      platform,
 	}
 
 	if customTextFormat != "" {
