@@ -21,7 +21,7 @@ jobs:
       with:
         go-version: '1.22.8'
 
-    - run: cd src
+    - run: cd app
     - name: Build
       run: go build -v ./...
 
