@@ -31,7 +31,7 @@ jobs:
 
       - name: Automatic Review
         if: ${{ github.event_name == 'pull_request' }}
-        uses: ./.github/workflows/pull-request/go-steps
+        uses: ./.github/workflows/pull-request
 
       # - name: Install reviewdog
       #   if: ${{ github.event_name == 'pull_request' }}
