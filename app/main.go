@@ -82,3 +82,7 @@ func main() {
 func a() {
 
 }
+
+func b() {
+
+}
