@@ -1,5 +1,9 @@
 name: Automatic Review
 
+defaults:
+  run:
+    working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
+
 runs:
   using: "composite"
   steps:
