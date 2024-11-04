@@ -1,6 +1,7 @@
 name: Set up Go
 
 runs:
+  using: "composite"
   steps:
     - name: Install reviewdog
       run: |
