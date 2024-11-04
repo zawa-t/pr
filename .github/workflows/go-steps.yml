@@ -32,7 +32,7 @@ jobs:
       - name: Automatic Review
         if: ${{ github.event_name == 'pull_request' }}
         uses: ./.github/workflows/pull-request
-        secrets:
+        env:
           REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

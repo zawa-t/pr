@@ -1,9 +1,5 @@
 name: Automatic Review
 
-secrets:
-  REVIEWDOG_PAT:
-  GITHUB_TOKEN:
-
 runs:
   using: "composite"
   steps:
@@ -22,7 +18,7 @@ runs:
     - name: Run golangci-lint with reviewdog (GitHub Checks)
       shell: bash
       env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ env.GITHUB_TOKEN }}
       run: |
         golangci-lint run ./... | \
         reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
@@ -30,7 +26,7 @@ runs:
     - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
       shell: bash
       env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ env.REVIEWDOG_PAT }}
       run: |
         golangci-lint run ./... | \
         reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
