@@ -13,13 +13,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
-
     steps:
       - name: Start Message 
-        working-directory: "/" # このステップのみルートディレクトリで実行
+        # working-directory: "/" # このステップのみルートディレクトリで実行
         run: |
           echo "The job was automatically triggered by a ${{ github.event_name }} event."
           echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -28,53 +24,56 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22.8'
 
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
-        env:
-          GOBIN: $(go env GOPATH)/bin
+  call-go-steps:
+    uses: ./.github/workflows/go-steps.yml 
 
-      - name: Install reviewdog
-        run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+      # - name: Set up Go
+      #   uses: actions/setup-go@v5
+      #   with:
+      #     go-version: '1.22.8'
+
+      # - name: Install golangci-lint
+      #   run: |
+      #     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
+      #   env:
+      #     GOBIN: $(go env GOPATH)/bin
+
+      # - name: Install reviewdog
+      #   run: |
+      #     curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      # # - name: Run golangci-lint with reviewdog (GitHub Checks)
+      # #   env:
+      # #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # #   run: |
+      # #     golangci-lint run ./... | \
+      # #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       # - name: Run golangci-lint with reviewdog (GitHub Checks)
       #   env:
       #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     golangci-lint run ./... | \
-      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
 
-      - name: Run golangci-lint with reviewdog (GitHub Checks)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
-
-      - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
-
-      # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
+      # - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
       #   env:
-      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
       #   run: |
       #     golangci-lint run ./... | \
-      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
 
-      - name: Build
-        run: go build -v ./...
+      # # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
+      # #   env:
+      # #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # #   run: |
+      # #     golangci-lint run ./... | \
+      # #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
 
-      - name: Test
-        run: go test -v ./...
+      # - name: Build Test
+      #   run: go build -v ./...
+
+      # - name: Unit Test
+      #   run: go test -v ./...
 
