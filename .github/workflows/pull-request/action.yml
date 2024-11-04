@@ -1,14 +1,11 @@
 name: Automatic Review
 
-defaults:
-  run:
-    working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
-
 runs:
   using: "composite"
   steps:
     - name: Install reviewdog
       shell: bash
+      working-directory: ./app
       run: |
         curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
@@ -21,6 +18,7 @@ runs:
 
     - name: Run golangci-lint with reviewdog (GitHub Checks)
       shell: bash
+      working-directory: ./app
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ env.GITHUB_TOKEN }}
       run: |
@@ -29,6 +27,7 @@ runs:
 
     - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
       shell: bash
+      working-directory: ./app
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ env.REVIEWDOG_PAT }}
       run: |
