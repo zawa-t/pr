@@ -1,0 +1,43 @@
+name: Lint and Test
+
+on:
+  workflow_call: # リユーザブルワークフローとして定義
+    secrets:
+      REVIEWDOG_PAT:
+
+jobs:
+  go-steps:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.8'
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
+        env:
+          GOBIN: $(go env GOPATH)/bin
+
+      - name: Automatic Review
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ./.github/workflows/pull-request
+        env:
+          REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Test
+        run: go build -v ./...
+
+      - name: Unit Test
+        run: go test -v ./...
