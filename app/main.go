@@ -78,11 +78,3 @@ func main() {
 
 	slog.Info("The pull request comments were successfully added.")
 }
-
-func a() {
-
-}
-
-func b() {
-
-}
