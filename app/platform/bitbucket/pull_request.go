@@ -1,4 +1,3 @@
-//go:generate moq -rm -out $GOPATH/app/test/mock/$GOFILE -pkg mock . CustomClient
 package bitbucket
 
 import (
@@ -10,31 +9,23 @@ import (
 	"github.com/zawa-t/pr-commentator/platform"
 )
 
-type CustomClient interface {
-	PostComment(ctx context.Context, data CommentData) error
-	UpsertReport(ctx context.Context, reportID string, data ReportData) error
-	GetReport(ctx context.Context, reportID string) (*AnnotationResponse, error)
-	DeleteReport(ctx context.Context, reportID string) error
-	BulkUpsertAnnotations(ctx context.Context, datas []AnnotationData, reportID string) error
-}
-
 type pullRequest struct {
-	client CustomClient
+	review Review
 }
 
-func NewPullRequest(cc CustomClient) *pullRequest {
-	return &pullRequest{cc}
+func NewPullRequest(r Review) *pullRequest {
+	return &pullRequest{r}
 }
 
-func (p *pullRequest) AddComments(ctx context.Context, input platform.Input) error {
+func (pr *pullRequest) AddComments(ctx context.Context, input platform.Data) error {
 	reportID := fmt.Sprintf("pr-commentator-%s", input.Name)
 
-	if err := p.createReport(ctx, input, reportID); err != nil {
+	if err := pr.createReport(ctx, input, reportID); err != nil {
 		return fmt.Errorf("failed to exec p.createReport(): %w", err)
 	}
 
-	if len(input.Datas) > 0 {
-		if err := p.addComments(ctx, input, reportID); err != nil {
+	if len(input.RawDatas) > 0 {
+		if err := pr.addComments(ctx, input, reportID); err != nil {
 			return fmt.Errorf("failed to exec p.addComments(): %w", err)
 		}
 	}
@@ -42,45 +33,45 @@ func (p *pullRequest) AddComments(ctx context.Context, input platform.Input) err
 	return nil
 }
 
-func (p *pullRequest) createReport(ctx context.Context, input platform.Input, reportID string) error {
+func (pr *pullRequest) createReport(ctx context.Context, input platform.Data, reportID string) error {
 	reportData := ReportData{
 		Title:      fmt.Sprintf("[%s] PR-Commentator report", input.Name),
 		Details:    "Meow-Meow! This report generated for you by pr-commentator.", // TODO: 内容については要検討
 		ReportType: "TEST",
 	}
 
-	if len(input.Datas) == 0 {
+	if len(input.RawDatas) == 0 {
 		reportData.Result = "PASSED"
 	} else {
 		reportData.Result = "FAILED"
 	}
 
 	// 存在確認
-	existingReport, err := p.client.GetReport(ctx, reportID)
+	existingReport, err := pr.review.GetReport(ctx, reportID)
 	if err != nil && err.Error() != platform.ErrNotFound.Error() { // TODO: err.Error() != platform.ErrNotFound.Error に errors.Is() が使えるやり方を検討
 		return fmt.Errorf("failed to exec p.client.getReport(): %w", err)
 	}
 	if existingReport != nil {
-		if err := p.client.DeleteReport(ctx, reportID); err != nil {
+		if err := pr.review.DeleteReport(ctx, reportID); err != nil {
 			return fmt.Errorf("failed to exec p.client.deleteReport(): %w", err)
 		}
 	}
 
-	if err := p.client.UpsertReport(ctx, reportID, reportData); err != nil {
+	if err := pr.review.UpsertReport(ctx, reportID, reportData); err != nil {
 		return fmt.Errorf("failed to exec p.client.upsertReport(): %w", err)
 	}
 	return nil
 }
 
-func (p *pullRequest) addComments(ctx context.Context, input platform.Input, reportID string) error {
-	if len(input.Datas) == 0 {
+func (pr *pullRequest) addComments(ctx context.Context, input platform.Data, reportID string) error {
+	if len(input.RawDatas) == 0 {
 		return fmt.Errorf("there is no data to comment")
 	}
 
-	comments := make([]CommentData, len(input.Datas))
-	annotations := make([]AnnotationData, len(input.Datas))
+	comments := make([]CommentData, len(input.RawDatas))
+	annotations := make([]AnnotationData, len(input.RawDatas))
 
-	for i, data := range input.Datas {
+	for i, data := range input.RawDatas {
 		var text string
 		if data.CustomCommentText != nil {
 			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *data.CustomCommentText)
@@ -115,11 +106,11 @@ func (p *pullRequest) addComments(ctx context.Context, input platform.Input, rep
 
 	var multiErr error // NOTE: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
 	for _, comment := range comments {
-		if err := p.client.PostComment(ctx, comment); err != nil {
+		if err := pr.review.PostComment(ctx, comment); err != nil {
 			multiErr = errors.Join(multiErr, err)
 		}
 	}
-	if err := p.client.BulkUpsertAnnotations(ctx, annotations, reportID); err != nil {
+	if err := pr.review.BulkUpsertAnnotations(ctx, annotations, reportID); err != nil {
 		multiErr = errors.Join(multiErr, err)
 	}
 

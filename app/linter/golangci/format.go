@@ -12,7 +12,7 @@ import (
 	"github.com/zawa-t/pr-commentator/platform"
 )
 
-func MakeInputDatas(flagValue flag.Value, stdin *os.File) (datas []platform.Data) {
+func MakeInputDatas(flagValue flag.Value, stdin *os.File) (datas []platform.Raw) {
 	switch flagValue.FileExtension {
 	case "txt":
 		// input.Datas = readText(*flagValue)
@@ -38,10 +38,10 @@ func replaceText(alternativeText string, issues []Issue) []Issue {
 	return issues
 }
 
-func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Data {
-	datas := make([]platform.Data, 0)
+func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Raw {
+	datas := make([]platform.Raw, 0)
 	for _, v := range issues {
-		data := platform.Data{
+		data := platform.Raw{
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,

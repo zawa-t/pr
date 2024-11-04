@@ -1,3 +1,4 @@
+//go:generate moq -rm -out $GOPATH/app/test/mock/$GOFILE -pkg mock . Review
 package platform
 
 import (
@@ -5,27 +6,27 @@ import (
 	"errors"
 )
 
-type Platform struct {
-	PullRequest PullRequest
+type PullRequest struct {
+	Review
 }
 
-func New(pr PullRequest) *Platform {
-	return &Platform{pr}
+func NewPullRequest(r Review) *PullRequest {
+	return &PullRequest{r}
 }
 
-// PullRequest ...
-type PullRequest interface {
-	AddComments(ctx context.Context, data Input) error
-}
-
-// Input ...
-type Input struct {
-	Name  string
-	Datas []Data
+// Review ...
+type Review interface {
+	AddComments(ctx context.Context, data Data) error
 }
 
 // Data ...
 type Data struct {
+	Name     string
+	RawDatas []Raw
+}
+
+// Raw ...
+type Raw struct {
 	Linter            string
 	FilePath          string
 	LineNum           uint

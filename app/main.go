@@ -12,7 +12,9 @@ import (
 	"github.com/zawa-t/pr-commentator/log"
 	"github.com/zawa-t/pr-commentator/platform"
 	"github.com/zawa-t/pr-commentator/platform/bitbucket"
-	"github.com/zawa-t/pr-commentator/platform/bitbucket/client"
+	bitbucketClient "github.com/zawa-t/pr-commentator/platform/bitbucket/client"
+	"github.com/zawa-t/pr-commentator/platform/github"
+	githubClient "github.com/zawa-t/pr-commentator/platform/github/client"
 	"github.com/zawa-t/pr-commentator/platform/http"
 	"github.com/zawa-t/pr-commentator/test/custommock"
 )
@@ -21,7 +23,7 @@ import (
 以下、動作確認用コマンド
 ```
 $ go build -o pr-comment
-$ ./pr-comment -n=golangci-lint -ext=json < sample.json
+$ ./pr-comment -n=golangci-lint -ext=json --platform=bitbucket < sample.json
 ```
 */
 
@@ -46,32 +48,36 @@ func main() {
 	}
 
 	flagValue := flag.NewValue()
-	input := platform.Input{
+	data := platform.Data{
 		Name: flagValue.Name,
 	}
 
 	switch flagValue.Name {
 	case "golangci-lint":
-		input.Datas = golangci.MakeInputDatas(*flagValue, stdin)
+		data.RawDatas = golangci.MakeInputDatas(*flagValue, stdin)
 	default:
-		input.Datas = txt.Read(*flagValue, stdin)
+		data.RawDatas = txt.Read(*flagValue, stdin)
 	}
 
-	log.PrintJSON("platform.Input", input)
+	log.PrintJSON("platform.Data", data)
 
-	var pf *platform.Platform
+	var pr *platform.PullRequest
 	switch flagValue.Platform {
 	case platform.Bitbucket:
 		if env.Env.IsLocal() {
-			pf = platform.New(bitbucket.NewPullRequest(custommock.DefaultCustomClient))
+			pr = platform.NewPullRequest(bitbucket.NewPullRequest(custommock.DefaultBitbucketReview))
 		} else {
-			pf = platform.New(bitbucket.NewPullRequest(client.NewCustomClient(http.NewClient())))
+			pr = platform.NewPullRequest(bitbucket.NewPullRequest(bitbucketClient.NewCustomClient(http.NewClient())))
 		}
 	case platform.Github:
-		// TODO: 処理追加
+		if env.Env.IsLocal() {
+			pr = platform.NewPullRequest(github.NewPullRequest(custommock.DefaultGithubReview))
+		} else {
+			pr = platform.NewPullRequest(github.NewPullRequest(githubClient.NewCustomClient(http.NewClient())))
+		}
 	}
 
-	if err := pf.PullRequest.AddComments(context.Background(), input); err != nil {
+	if err := pr.AddComments(context.Background(), data); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}

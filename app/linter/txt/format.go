@@ -12,8 +12,8 @@ import (
 	"github.com/zawa-t/pr-commentator/platform"
 )
 
-func Read(flagValue flag.Value, stdin *os.File) []platform.Data {
-	datas := make([]platform.Data, 0)
+func Read(flagValue flag.Value, stdin *os.File) []platform.Raw {
+	datas := make([]platform.Raw, 0)
 
 	var last bool
 	reader := bufio.NewReader(stdin)
@@ -57,7 +57,7 @@ func Read(flagValue flag.Value, stdin *os.File) []platform.Data {
 			text = *flagValue.AlternativeText
 		}
 
-		datas = append(datas, platform.Data{
+		datas = append(datas, platform.Raw{
 			Linter:   flagValue.Name,
 			FilePath: columns[0],
 			LineNum:  uint(lineNum),

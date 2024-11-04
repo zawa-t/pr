@@ -5,290 +5,78 @@ package mock
 
 import (
 	"context"
-	"github.com/zawa-t/pr-commentator/platform/bitbucket"
+	"github.com/zawa-t/pr-commentator/platform"
 	"sync"
 )
 
-// Ensure, that CustomClientMock does implement bitbucket.CustomClient.
+// Ensure, that ReviewMock does implement platform.Review.
 // If this is not the case, regenerate this file with moq.
-var _ bitbucket.CustomClient = &CustomClientMock{}
+var _ platform.Review = &ReviewMock{}
 
-// CustomClientMock is a mock implementation of bitbucket.CustomClient.
+// ReviewMock is a mock implementation of platform.Review.
 //
-//	func TestSomethingThatUsesCustomClient(t *testing.T) {
+//	func TestSomethingThatUsesReview(t *testing.T) {
 //
-//		// make and configure a mocked bitbucket.CustomClient
-//		mockedCustomClient := &CustomClientMock{
-//			BulkUpsertAnnotationsFunc: func(ctx context.Context, datas []bitbucket.AnnotationData, reportID string) error {
-//				panic("mock out the BulkUpsertAnnotations method")
-//			},
-//			DeleteReportFunc: func(ctx context.Context, reportID string) error {
-//				panic("mock out the DeleteReport method")
-//			},
-//			GetReportFunc: func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error) {
-//				panic("mock out the GetReport method")
-//			},
-//			PostCommentFunc: func(ctx context.Context, data bitbucket.CommentData) error {
-//				panic("mock out the PostComment method")
-//			},
-//			UpsertReportFunc: func(ctx context.Context, reportID string, data bitbucket.ReportData) error {
-//				panic("mock out the UpsertReport method")
+//		// make and configure a mocked platform.Review
+//		mockedReview := &ReviewMock{
+//			AddCommentsFunc: func(ctx context.Context, data platform.Data) error {
+//				panic("mock out the AddComments method")
 //			},
 //		}
 //
-//		// use mockedCustomClient in code that requires bitbucket.CustomClient
+//		// use mockedReview in code that requires platform.Review
 //		// and then make assertions.
 //
 //	}
-type CustomClientMock struct {
-	// BulkUpsertAnnotationsFunc mocks the BulkUpsertAnnotations method.
-	BulkUpsertAnnotationsFunc func(ctx context.Context, datas []bitbucket.AnnotationData, reportID string) error
-
-	// DeleteReportFunc mocks the DeleteReport method.
-	DeleteReportFunc func(ctx context.Context, reportID string) error
-
-	// GetReportFunc mocks the GetReport method.
-	GetReportFunc func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error)
-
-	// PostCommentFunc mocks the PostComment method.
-	PostCommentFunc func(ctx context.Context, data bitbucket.CommentData) error
-
-	// UpsertReportFunc mocks the UpsertReport method.
-	UpsertReportFunc func(ctx context.Context, reportID string, data bitbucket.ReportData) error
+type ReviewMock struct {
+	// AddCommentsFunc mocks the AddComments method.
+	AddCommentsFunc func(ctx context.Context, data platform.Data) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// BulkUpsertAnnotations holds details about calls to the BulkUpsertAnnotations method.
-		BulkUpsertAnnotations []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Datas is the datas argument value.
-			Datas []bitbucket.AnnotationData
-			// ReportID is the reportID argument value.
-			ReportID string
-		}
-		// DeleteReport holds details about calls to the DeleteReport method.
-		DeleteReport []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// ReportID is the reportID argument value.
-			ReportID string
-		}
-		// GetReport holds details about calls to the GetReport method.
-		GetReport []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// ReportID is the reportID argument value.
-			ReportID string
-		}
-		// PostComment holds details about calls to the PostComment method.
-		PostComment []struct {
+		// AddComments holds details about calls to the AddComments method.
+		AddComments []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Data is the data argument value.
-			Data bitbucket.CommentData
-		}
-		// UpsertReport holds details about calls to the UpsertReport method.
-		UpsertReport []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// ReportID is the reportID argument value.
-			ReportID string
-			// Data is the data argument value.
-			Data bitbucket.ReportData
+			Data platform.Data
 		}
 	}
-	lockBulkUpsertAnnotations sync.RWMutex
-	lockDeleteReport          sync.RWMutex
-	lockGetReport             sync.RWMutex
-	lockPostComment           sync.RWMutex
-	lockUpsertReport          sync.RWMutex
+	lockAddComments sync.RWMutex
 }
 
-// BulkUpsertAnnotations calls BulkUpsertAnnotationsFunc.
-func (mock *CustomClientMock) BulkUpsertAnnotations(ctx context.Context, datas []bitbucket.AnnotationData, reportID string) error {
-	if mock.BulkUpsertAnnotationsFunc == nil {
-		panic("CustomClientMock.BulkUpsertAnnotationsFunc: method is nil but CustomClient.BulkUpsertAnnotations was just called")
-	}
-	callInfo := struct {
-		Ctx      context.Context
-		Datas    []bitbucket.AnnotationData
-		ReportID string
-	}{
-		Ctx:      ctx,
-		Datas:    datas,
-		ReportID: reportID,
-	}
-	mock.lockBulkUpsertAnnotations.Lock()
-	mock.calls.BulkUpsertAnnotations = append(mock.calls.BulkUpsertAnnotations, callInfo)
-	mock.lockBulkUpsertAnnotations.Unlock()
-	return mock.BulkUpsertAnnotationsFunc(ctx, datas, reportID)
-}
-
-// BulkUpsertAnnotationsCalls gets all the calls that were made to BulkUpsertAnnotations.
-// Check the length with:
-//
-//	len(mockedCustomClient.BulkUpsertAnnotationsCalls())
-func (mock *CustomClientMock) BulkUpsertAnnotationsCalls() []struct {
-	Ctx      context.Context
-	Datas    []bitbucket.AnnotationData
-	ReportID string
-} {
-	var calls []struct {
-		Ctx      context.Context
-		Datas    []bitbucket.AnnotationData
-		ReportID string
-	}
-	mock.lockBulkUpsertAnnotations.RLock()
-	calls = mock.calls.BulkUpsertAnnotations
-	mock.lockBulkUpsertAnnotations.RUnlock()
-	return calls
-}
-
-// DeleteReport calls DeleteReportFunc.
-func (mock *CustomClientMock) DeleteReport(ctx context.Context, reportID string) error {
-	if mock.DeleteReportFunc == nil {
-		panic("CustomClientMock.DeleteReportFunc: method is nil but CustomClient.DeleteReport was just called")
-	}
-	callInfo := struct {
-		Ctx      context.Context
-		ReportID string
-	}{
-		Ctx:      ctx,
-		ReportID: reportID,
-	}
-	mock.lockDeleteReport.Lock()
-	mock.calls.DeleteReport = append(mock.calls.DeleteReport, callInfo)
-	mock.lockDeleteReport.Unlock()
-	return mock.DeleteReportFunc(ctx, reportID)
-}
-
-// DeleteReportCalls gets all the calls that were made to DeleteReport.
-// Check the length with:
-//
-//	len(mockedCustomClient.DeleteReportCalls())
-func (mock *CustomClientMock) DeleteReportCalls() []struct {
-	Ctx      context.Context
-	ReportID string
-} {
-	var calls []struct {
-		Ctx      context.Context
-		ReportID string
-	}
-	mock.lockDeleteReport.RLock()
-	calls = mock.calls.DeleteReport
-	mock.lockDeleteReport.RUnlock()
-	return calls
-}
-
-// GetReport calls GetReportFunc.
-func (mock *CustomClientMock) GetReport(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error) {
-	if mock.GetReportFunc == nil {
-		panic("CustomClientMock.GetReportFunc: method is nil but CustomClient.GetReport was just called")
-	}
-	callInfo := struct {
-		Ctx      context.Context
-		ReportID string
-	}{
-		Ctx:      ctx,
-		ReportID: reportID,
-	}
-	mock.lockGetReport.Lock()
-	mock.calls.GetReport = append(mock.calls.GetReport, callInfo)
-	mock.lockGetReport.Unlock()
-	return mock.GetReportFunc(ctx, reportID)
-}
-
-// GetReportCalls gets all the calls that were made to GetReport.
-// Check the length with:
-//
-//	len(mockedCustomClient.GetReportCalls())
-func (mock *CustomClientMock) GetReportCalls() []struct {
-	Ctx      context.Context
-	ReportID string
-} {
-	var calls []struct {
-		Ctx      context.Context
-		ReportID string
-	}
-	mock.lockGetReport.RLock()
-	calls = mock.calls.GetReport
-	mock.lockGetReport.RUnlock()
-	return calls
-}
-
-// PostComment calls PostCommentFunc.
-func (mock *CustomClientMock) PostComment(ctx context.Context, data bitbucket.CommentData) error {
-	if mock.PostCommentFunc == nil {
-		panic("CustomClientMock.PostCommentFunc: method is nil but CustomClient.PostComment was just called")
+// AddComments calls AddCommentsFunc.
+func (mock *ReviewMock) AddComments(ctx context.Context, data platform.Data) error {
+	if mock.AddCommentsFunc == nil {
+		panic("ReviewMock.AddCommentsFunc: method is nil but Review.AddComments was just called")
 	}
 	callInfo := struct {
 		Ctx  context.Context
-		Data bitbucket.CommentData
+		Data platform.Data
 	}{
 		Ctx:  ctx,
 		Data: data,
 	}
-	mock.lockPostComment.Lock()
-	mock.calls.PostComment = append(mock.calls.PostComment, callInfo)
-	mock.lockPostComment.Unlock()
-	return mock.PostCommentFunc(ctx, data)
+	mock.lockAddComments.Lock()
+	mock.calls.AddComments = append(mock.calls.AddComments, callInfo)
+	mock.lockAddComments.Unlock()
+	return mock.AddCommentsFunc(ctx, data)
 }
 
-// PostCommentCalls gets all the calls that were made to PostComment.
+// AddCommentsCalls gets all the calls that were made to AddComments.
 // Check the length with:
 //
-//	len(mockedCustomClient.PostCommentCalls())
-func (mock *CustomClientMock) PostCommentCalls() []struct {
+//	len(mockedReview.AddCommentsCalls())
+func (mock *ReviewMock) AddCommentsCalls() []struct {
 	Ctx  context.Context
-	Data bitbucket.CommentData
+	Data platform.Data
 } {
 	var calls []struct {
 		Ctx  context.Context
-		Data bitbucket.CommentData
+		Data platform.Data
 	}
-	mock.lockPostComment.RLock()
-	calls = mock.calls.PostComment
-	mock.lockPostComment.RUnlock()
-	return calls
-}
-
-// UpsertReport calls UpsertReportFunc.
-func (mock *CustomClientMock) UpsertReport(ctx context.Context, reportID string, data bitbucket.ReportData) error {
-	if mock.UpsertReportFunc == nil {
-		panic("CustomClientMock.UpsertReportFunc: method is nil but CustomClient.UpsertReport was just called")
-	}
-	callInfo := struct {
-		Ctx      context.Context
-		ReportID string
-		Data     bitbucket.ReportData
-	}{
-		Ctx:      ctx,
-		ReportID: reportID,
-		Data:     data,
-	}
-	mock.lockUpsertReport.Lock()
-	mock.calls.UpsertReport = append(mock.calls.UpsertReport, callInfo)
-	mock.lockUpsertReport.Unlock()
-	return mock.UpsertReportFunc(ctx, reportID, data)
-}
-
-// UpsertReportCalls gets all the calls that were made to UpsertReport.
-// Check the length with:
-//
-//	len(mockedCustomClient.UpsertReportCalls())
-func (mock *CustomClientMock) UpsertReportCalls() []struct {
-	Ctx      context.Context
-	ReportID string
-	Data     bitbucket.ReportData
-} {
-	var calls []struct {
-		Ctx      context.Context
-		ReportID string
-		Data     bitbucket.ReportData
-	}
-	mock.lockUpsertReport.RLock()
-	calls = mock.calls.UpsertReport
-	mock.lockUpsertReport.RUnlock()
+	mock.lockAddComments.RLock()
+	calls = mock.calls.AddComments
+	mock.lockAddComments.RUnlock()
 	return calls
 }

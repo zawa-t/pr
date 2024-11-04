@@ -25,7 +25,13 @@ func (h header) Add(key string, values ...string) header {
 // 	return header{header: header, cookies: nil}
 // }
 
-var ContentType string = "Content-Type"
+var RequestHeader = struct {
+	Accept      string
+	ContentType string
+}{
+	Accept:      "Accept",
+	ContentType: "Content-Type",
+}
 
 var ApplicationJSON = "application/json"
 

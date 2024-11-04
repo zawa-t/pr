@@ -17,7 +17,7 @@ type customClient struct {
 	httpClient http.Client
 }
 
-// NewClient creates a new client from options.
+// NewCustomClient creates a new client from options.
 func NewCustomClient(hc http.Client) *customClient {
 	return &customClient{hc}
 }
@@ -33,7 +33,7 @@ func (c *customClient) PostComment(ctx context.Context, data bitbucket.CommentDa
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetHeader(http.Header().Add(http.ContentType, http.ApplicationJSON))
+	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
 	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
 
 	res, err := c.httpClient.Send(ctx, req)
@@ -60,7 +60,7 @@ func (c *customClient) UpsertReport(ctx context.Context, reportID string, data b
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetHeader(http.Header().Add(http.ContentType, http.ApplicationJSON))
+	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
 	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)
@@ -147,7 +147,7 @@ func (c *customClient) BulkUpsertAnnotations(ctx context.Context, datas []bitbuc
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetHeader(http.Header().Add(http.ContentType, http.ApplicationJSON))
+	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
 	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)

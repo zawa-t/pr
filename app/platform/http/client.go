@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Client ...
 type Client interface {
 	Send(ctx context.Context, req *Request) (*Response, error)
 }
