@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 
@@ -78,12 +77,4 @@ func main() {
 	}
 
 	slog.Info("The pull request comments were successfully added.")
-}
-
-func a() {
-fmt.Println("xxx")
-}
-
-func b() {
-
 }

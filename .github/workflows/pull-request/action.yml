@@ -23,18 +23,18 @@ runs:
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ env.GITHUB_TOKEN }}
       run: |
-        golangci-lint run --fix ./... | \
+        golangci-lint run ./... | \
         reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
 
-    - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
-      shell: bash
-      working-directory: ./app
-      continue-on-error: true
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ env.REVIEWDOG_PAT }}
-      run: |
-        golangci-lint run ./... | \
-        reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
+    # - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
+    #   shell: bash
+    #   working-directory: ./app
+    #   continue-on-error: true
+    #   env:
+    #     REVIEWDOG_GITHUB_API_TOKEN: ${{ env.REVIEWDOG_PAT }}
+    #   run: |
+    #     golangci-lint run ./... | \
+    #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
 
     # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
     #   env:
