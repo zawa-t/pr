@@ -58,12 +58,12 @@ jobs:
           golangci-lint run ./... | \
           reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
 
-      - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
+      # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
+      #   env:
+      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     golangci-lint run ./... | \
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
 
       - name: Build
         run: go build -v ./...
