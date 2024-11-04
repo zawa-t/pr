@@ -2,6 +2,8 @@ name: Lint and Test
 
 on:
   workflow_call: # リユーザブルワークフローとして定義
+    secrets:
+      REVIEWDOG_PAT:
 
 jobs:
   go_steps:

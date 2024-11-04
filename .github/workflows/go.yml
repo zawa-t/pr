@@ -23,7 +23,8 @@ jobs:
 
   call-go-steps:
     uses: ./.github/workflows/go-steps.yml 
-
+    secrets:
+      REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
       # - name: Set up Go
       #   uses: actions/setup-go@v5
       #   with:
