@@ -80,7 +80,7 @@ func main() {
 }
 
 func a() {
-
+fmt.Println("xxx")
 }
 
 func b() {
