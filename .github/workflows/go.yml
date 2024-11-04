@@ -44,12 +44,12 @@ jobs:
         run: |
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Run golangci-lint with reviewdog (GitHub Checks)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
+      # - name: Run golangci-lint with reviewdog (GitHub Checks)
+      #   env:
+      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     golangci-lint run ./... | \
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       - name: Run golangci-lint with reviewdog (GitHub Checks)
         env:
