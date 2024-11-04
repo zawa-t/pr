@@ -2,6 +2,7 @@ name: Automatic Review
 
 secrets:
   REVIEWDOG_PAT:
+  GITHUB_TOKEN:
 
 runs:
   using: "composite"
