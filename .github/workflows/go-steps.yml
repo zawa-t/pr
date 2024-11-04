@@ -6,7 +6,7 @@ on:
       REVIEWDOG_PAT:
 
 jobs:
-  go_steps:
+  go-steps:
     runs-on: ubuntu-latest
 
     defaults:
@@ -29,37 +29,42 @@ jobs:
         env:
           GOBIN: $(go env GOPATH)/bin
 
-      - name: Install reviewdog
-        run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+      - name: Automatic Review
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ./.github/workflows/pull-request/go-steps
+
+      # - name: Install reviewdog
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   run: |
+      #     curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      # # - name: Run golangci-lint with reviewdog (GitHub Checks)
+      # #   env:
+      # #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # #   run: |
+      # #     golangci-lint run ./... | \
+      # #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       # - name: Run golangci-lint with reviewdog (GitHub Checks)
       #   env:
       #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     golangci-lint run ./... | \
-      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
 
-      - name: Run golangci-lint with reviewdog (GitHub Checks)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
-
-      - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
-        run: |
-          golangci-lint run ./... | \
-          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
-
-      # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
+      # - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
       #   env:
-      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
       #   run: |
       #     golangci-lint run ./... | \
-      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
+      #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review
+
+      # # - name: Run golangci-lint with reviewdog (GitHub PR Annotations)
+      # #   env:
+      # #     REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # #   run: |
+      # #     golangci-lint run ./... | \
+      # #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-annotations
 
       - name: Build Test
         run: go build -v ./...
