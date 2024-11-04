@@ -1,9 +1,13 @@
-name: Set up Go
+name: Automatic Review
+
+secrets:
+  REVIEWDOG_PAT:
 
 runs:
   using: "composite"
   steps:
     - name: Install reviewdog
+      shell: bash
       run: |
         curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
@@ -15,6 +19,7 @@ runs:
     #     reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
     - name: Run golangci-lint with reviewdog (GitHub Checks)
+      shell: bash
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -22,6 +27,7 @@ runs:
         reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-check
 
     - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
+      shell: bash
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.REVIEWDOG_PAT }}
       run: |

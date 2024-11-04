@@ -32,6 +32,8 @@ jobs:
       - name: Automatic Review
         if: ${{ github.event_name == 'pull_request' }}
         uses: ./.github/workflows/pull-request
+        secrets:
+          REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
 
       # - name: Install reviewdog
       #   if: ${{ github.event_name == 'pull_request' }}
