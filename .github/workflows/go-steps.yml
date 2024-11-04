@@ -12,6 +12,10 @@ jobs:
         working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
