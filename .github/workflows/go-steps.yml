@@ -13,8 +13,6 @@ jobs:
       run:
         working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
 
-    secrets:
-      REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
