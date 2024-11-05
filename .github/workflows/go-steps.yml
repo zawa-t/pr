@@ -9,10 +9,6 @@ jobs:
   go-steps:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
-
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
