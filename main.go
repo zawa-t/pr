@@ -22,8 +22,8 @@ import (
 /*
 以下、動作確認用コマンド
 ```
-$ go build -o pr-comment
-$ ./pr-comment -n=golangci-lint -ext=json --platform=bitbucket < sample.json
+$ go build -o pr-commentator
+$ ./pr-commentator -n=golangci-lint -ext=json --platform=bitbucket < sample.json
 ```
 */
 
