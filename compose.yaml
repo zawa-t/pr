@@ -6,7 +6,7 @@ services:
     image: pr-commentator-img
     container_name: pr-commentator
     volumes:
-      - ./app:/go/app
+      - ./:/go/app
     env_file:
       - .env
     tty: true
