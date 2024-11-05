@@ -26,14 +26,18 @@ func (h header) Add(key string, values ...string) header {
 // }
 
 var RequestHeader = struct {
-	Accept      string
-	ContentType string
+	Accept        string
+	ContentType   string
+	Authorization string
 }{
-	Accept:      "Accept",
-	ContentType: "Content-Type",
+	Accept:        "Accept",
+	ContentType:   "Content-Type",
+	Authorization: "Authorization",
 }
 
-var ApplicationJSON = "application/json"
+var (
+	ApplicationJSON = "application/json"
+)
 
 // Cookies is the http cookies.
 type Cookies []*http.Cookie

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/zawa-t/pr-commentator/src/env"
 	"github.com/zawa-t/pr-commentator/src/platform/github"
 	"github.com/zawa-t/pr-commentator/src/platform/http"
 )
@@ -31,16 +32,13 @@ func (c *Custom) CreateComment(ctx context.Context, data github.CommentData) err
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
-	req.SetHeader(http.Header().Add(http.RequestHeader.Accept, "application/vnd.github+json"))
-	req.SetHeader(http.Header().Add("X-GitHub-Api-Version", "2022-11-28"))
-	req.SetBasicAuth("", "") // TODO: 何を設定すべきか検討
-	/*
-		(参考)
-		-H "Accept: application/vnd.github+json" \
-		-H "Authorization: Bearer <YOUR-TOKEN>" \
-		-H "X-GitHub-Api-Version: 2022-11-28" \
-	*/
+	req.SetHeader(
+		http.Header().
+			Add(http.RequestHeader.ContentType, http.ApplicationJSON).
+			Add(http.RequestHeader.Accept, "application/vnd.github+json").
+			Add("X-GitHub-Api-Version", "2022-11-28").
+			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.GithubAPIToken)),
+	)
 
 	res, err := c.httpClient.Send(ctx, req)
 	if err != nil {
