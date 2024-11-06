@@ -1,21 +1,46 @@
-//go:generate moq -rm -out $GOPATH/app/src/test/mock/github/$GOFILE -pkg mock . Review
 package github
 
-import "context"
+import (
+	"context"
+	"errors"
+
+	"github.com/zawa-t/pr-commentator/src/env"
+	"github.com/zawa-t/pr-commentator/src/log"
+	"github.com/zawa-t/pr-commentator/src/platform"
+)
 
 // Review ...
-type Review interface {
-	CreateComment(ctx context.Context, data CommentData) error
+type Review struct {
+	client Client
 }
 
-// CommentData ...
-// 参考：https://docs.github.com/ja/rest/pulls/comments?apiVersion=2022-11-28#create-a-review-comment-for-a-pull-request
-type CommentData struct {
-	Body      string `json:"body"`       // example:"Great stuff!"
-	CommitID  string `json:"commit_id"`  // example:"6dcb09b5b57875f334f61aebed695e2e4193db5e"
-	Path      string `json:"path"`       // example:"file1.txt"
-	StartLine uint   `json:"start_line"` // example:1
-	StartSide string `json:"start_side"` // example:"RIGHT"
-	Line      uint   `json:"line"`       // example:2
-	Side      string `json:"side"`       // example:"RIGHT"
+// NewReview ...
+func NewReview(c Client) *Review {
+	return &Review{c}
+}
+
+// AddComments ...
+func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
+	comments := make([]CommentData, len(input.RawDatas))
+	for i, data := range input.RawDatas {
+		comments[i] = CommentData{
+			Body:      data.Details,
+			CommitID:  env.GithubCommitID,
+			Path:      data.FilePath,
+			StartLine: data.LineNum - 1, // TODO: これで本当に良いか検討
+			Line:      data.LineNum,
+		}
+	}
+	log.PrintJSON("[]CommentData", comments)
+
+	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	for _, comment := range comments {
+		if err := r.client.CreateComment(ctx, comment); err != nil {
+			multiErr = errors.Join(multiErr, err)
+		}
+	}
+	if multiErr != nil {
+		return multiErr
+	}
+	return nil
 }

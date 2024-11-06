@@ -9,7 +9,7 @@ import (
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
-var usage = "Usage: pr-comment --name=[tool name] --ext=[file extension] --platform=[platform name] < inputfile"
+var usage = "Usage: pr-commentator --name=[tool name] --ext=[file extension] --platform=[platform name] < inputfile"
 
 type Required struct {
 	Name, FileExtension, Platform string

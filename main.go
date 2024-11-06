@@ -23,7 +23,7 @@ import (
 以下、動作確認用コマンド
 ```
 $ go build -o pr-commentator
-$ ./pr-commentator -n=golangci-lint -ext=json --platform=bitbucket < sample.json
+$ ./pr-commentator -n=golangci-lint -ext=json --platform=bitbucket < sample/sample.json
 ```
 */
 
@@ -72,15 +72,15 @@ func newPullRequest(pf string) (pr *platform.PullRequest) {
 	switch pf {
 	case platform.Bitbucket:
 		if env.Env.IsLocal() {
-			pr = platform.NewPullRequest(bitbucket.NewPullRequest(custommock.DefaultBitbucketReview))
+			pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))
 		} else {
-			pr = platform.NewPullRequest(bitbucket.NewPullRequest(bitbucketClient.NewCustomClient(http.NewClient())))
+			pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
 		}
 	case platform.Github:
 		if env.Env.IsLocal() {
-			pr = platform.NewPullRequest(github.NewPullRequest(custommock.DefaultGithubReview))
+			pr = platform.NewPullRequest(github.NewReview(custommock.DefaultGithubReview))
 		} else {
-			pr = platform.NewPullRequest(github.NewPullRequest(githubClient.NewCustomClient(http.NewClient())))
+			pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
 		}
 	default:
 		slog.Error("Unsupported platform was set.")
