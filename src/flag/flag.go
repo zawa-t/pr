@@ -9,10 +9,10 @@ import (
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
-var usage = "Usage: pr-commentator --name=[tool name] --ext=[file extension] --platform=[platform name] < inputfile"
+var usage = "Usage: pr-commentator --name=[tool name] --input-format=[input format] --platform=[platform name] < inputfile"
 
 type Required struct {
-	Name, FileExtension, Platform string
+	Name, InputFormat, Platform string
 }
 
 type Optional struct {
@@ -30,13 +30,13 @@ func NewValue() (value *Value) {
 	var name string
 	nameFlags := []string{"n", "name"}
 	for _, f := range nameFlags {
-		flag.StringVar(&name, f, "", "tool name. The flag is required.")
+		flag.StringVar(&name, f, "", "The tool name for static code analysis. The flag is required.")
 	}
 
-	var fileExtension string
-	fileExtFlags := []string{"ext", "extension"}
-	for _, f := range fileExtFlags {
-		flag.StringVar(&fileExtension, f, "", "file extension. The flag is required.")
+	var inputFormat string
+	inputFormatFlags := []string{"f", "input-format"}
+	for _, f := range inputFormatFlags {
+		flag.StringVar(&inputFormat, f, "", "input format. The flag is required. json, text")
 	}
 
 	var platform string
@@ -62,9 +62,9 @@ func NewValue() (value *Value) {
 
 	value = &Value{
 		Required: Required{
-			Name:          name,
-			FileExtension: fileExtension,
-			Platform:      platform,
+			Name:        name,
+			InputFormat: inputFormat,
+			Platform:    platform,
 		},
 	}
 
@@ -83,15 +83,23 @@ func NewValue() (value *Value) {
 }
 
 func (r *Required) validate() {
-	if r.Name == "" || r.FileExtension == "" || r.Platform == "" {
+	if r.Name == "" || r.InputFormat == "" || r.Platform == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
 
-	allowedExtensions := []string{"txt", "json"}
-	if !slices.Contains(allowedExtensions, r.FileExtension) {
-		slog.Error("The specified extension is not supported.")
+	allowedInputFormats := []string{"text", "json"}
+	if !slices.Contains(allowedInputFormats, r.InputFormat) {
+		slog.Error("The specified input-format is not supported.")
 		os.Exit(1)
+	}
+
+	if r.InputFormat == "json" {
+		allowedNames := []string{"golangci-lint"}
+		if !slices.Contains(allowedNames, r.Name) {
+			slog.Error("The specified tool cannot use json format data.")
+			os.Exit(1)
+		}
 	}
 
 	allowedPlatforms := []string{platform.Bitbucket, platform.Github}

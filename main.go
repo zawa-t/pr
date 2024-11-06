@@ -29,6 +29,9 @@ $ ./pr-commentator -n=golangci-lint -ext=json --platform=bitbucket < sample/samp
 
 /*
 TODO:
+・textフォーマット使用時にカラム指定ができるようにする（コロン3つでも対応可能にする）
+・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）
+・httpパッケージまわりの整備
 */
 
 func main() {
@@ -52,11 +55,16 @@ func main() {
 		Name: flagValue.Name,
 	}
 
-	switch flagValue.Name {
-	case "golangci-lint":
-		data.RawDatas = golangci.MakeInputDatas(*flagValue, stdin)
-	default:
+	switch flagValue.InputFormat {
+	case "json":
+		if flagValue.Name == "golangci-lint" {
+			data.RawDatas = golangci.MakeInputDatas(*flagValue, stdin)
+		}
+	case "text":
 		data.RawDatas = txt.Read(*flagValue, stdin)
+	default:
+		slog.Error("The specified input-format is not supported.")
+		os.Exit(1)
 	}
 	log.PrintJSON("platform.Data", data)
 

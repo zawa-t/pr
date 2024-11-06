@@ -79,7 +79,7 @@ func (pr *Review) addComments(ctx context.Context, input platform.Data, reportID
 		if data.CustomCommentText != nil {
 			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *data.CustomCommentText)
 		} else {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Details) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
+			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
 		}
 
 		comments[i] = CommentData{
@@ -96,8 +96,8 @@ func (pr *Review) addComments(ctx context.Context, input platform.Data, reportID
 			ExternalID:     fmt.Sprintf("pr-commentator-%03d", i+1), // NOTE: bulk annotations で一度に作成できるのは MAX 100件まで
 			Path:           data.FilePath,
 			Line:           data.LineNum,
-			Summary:        fmt.Sprintf("%s（%s）", data.Summary, data.Linter),
-			Details:        fmt.Sprintf("%s（%s）", data.Details, data.Linter),
+			Summary:        fmt.Sprintf("%s（%s）", data.Message, data.Linter),
+			Details:        fmt.Sprintf("%s（%s）", data.Message, data.Linter),
 			AnnotationType: "BUG",
 			Result:         "FAILED",
 			Severity:       "HIGH",
@@ -107,7 +107,7 @@ func (pr *Review) addComments(ctx context.Context, input platform.Data, reportID
 	log.PrintJSON("[]CommentData", comments)
 	log.PrintJSON("[]AnnotationData", comments)
 
-	var multiErr error // NOTE: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
 	for _, comment := range comments {
 		if err := pr.client.PostComment(ctx, comment); err != nil {
 			multiErr = errors.Join(multiErr, err)

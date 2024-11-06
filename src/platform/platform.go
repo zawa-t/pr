@@ -30,8 +30,7 @@ type Raw struct {
 	Linter            string
 	FilePath          string
 	LineNum           uint
-	Summary           string
-	Details           string
+	Message           string
 	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
 }
 

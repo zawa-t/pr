@@ -13,7 +13,7 @@ import (
 )
 
 func MakeInputDatas(flagValue flag.Value, stdin *os.File) (datas []platform.Raw) {
-	switch flagValue.FileExtension {
+	switch flagValue.InputFormat {
 	case "txt":
 		// input.Datas = readText(*flagValue)
 	case "json":
@@ -23,7 +23,7 @@ func MakeInputDatas(flagValue flag.Value, stdin *os.File) (datas []platform.Raw)
 		}
 		datas = makeInputDatas(flagValue.CustomTextFormat, jsonData.Issues)
 	default:
-		slog.Error("The specified extension could not be processed because it is not supported.")
+		slog.Error("The specified input-format could not be processed because it is not supported.")
 		os.Exit(1)
 	}
 	return
@@ -45,8 +45,7 @@ func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Raw {
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,
-			Summary:  v.Text,
-			Details:  v.Text,
+			Message:  v.Text,
 		}
 		if customTextFormat != nil {
 			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat) // HACK: 本来はfor文のたびにParseをする必要はないため、for文の外でParseするようにできないか検討

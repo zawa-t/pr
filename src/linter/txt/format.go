@@ -61,8 +61,7 @@ func Read(flagValue flag.Value, stdin *os.File) []platform.Raw {
 			Linter:   flagValue.Name,
 			FilePath: columns[0],
 			LineNum:  uint(lineNum),
-			Summary:  text,
-			Details:  text,
+			Message:  text,
 		})
 
 		if last {
