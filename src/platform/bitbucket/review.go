@@ -24,19 +24,26 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 	reportID := fmt.Sprintf("pr-commentator-%s", input.Name)
 
 	if err := r.createReport(ctx, input, reportID); err != nil {
-		return fmt.Errorf("failed to exec p.createReport(): %w", err)
+		return fmt.Errorf("failed to exec r.createReport(): %w", err)
 	}
+
+	comments, err := r.getComments(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to exec r.getComments(): %w", err)
+	}
+
+	fmt.Println(comments)
 
 	if len(input.RawDatas) > 0 {
 		if err := r.addComments(ctx, input, reportID); err != nil {
-			return fmt.Errorf("failed to exec p.addComments(): %w", err)
+			return fmt.Errorf("failed to exec r.addComments(): %w", err)
 		}
 	}
 
 	return nil
 }
 
-func (pr *Review) createReport(ctx context.Context, input platform.Data, reportID string) error {
+func (r *Review) createReport(ctx context.Context, input platform.Data, reportID string) error {
 	reportData := ReportData{
 		Title:      fmt.Sprintf("[%s] PR-Commentator report", input.Name),
 		Details:    "Meow-Meow! This report generated for you by pr-commentator.", // TODO: 内容については要検討
@@ -50,23 +57,27 @@ func (pr *Review) createReport(ctx context.Context, input platform.Data, reportI
 	}
 
 	// 存在確認
-	existingReport, err := pr.client.GetReport(ctx, reportID)
+	existingReport, err := r.client.GetReport(ctx, reportID)
 	if err != nil && err.Error() != platform.ErrNotFound.Error() { // TODO: err.Error() != platform.ErrNotFound.Error に errors.Is() が使えるやり方を検討
-		return fmt.Errorf("failed to exec p.client.getReport(): %w", err)
+		return fmt.Errorf("failed to exec r.client.getReport(): %w", err)
 	}
 	if existingReport != nil {
-		if err := pr.client.DeleteReport(ctx, reportID); err != nil {
-			return fmt.Errorf("failed to exec p.client.deleteReport(): %w", err)
+		if err := r.client.DeleteReport(ctx, reportID); err != nil {
+			return fmt.Errorf("failed to exec r.client.deleteReport(): %w", err)
 		}
 	}
 
-	if err := pr.client.UpsertReport(ctx, reportID, reportData); err != nil {
-		return fmt.Errorf("failed to exec p.client.upsertReport(): %w", err)
+	if err := r.client.UpsertReport(ctx, reportID, reportData); err != nil {
+		return fmt.Errorf("failed to exec r.client.upsertReport(): %w", err)
 	}
 	return nil
 }
 
-func (pr *Review) addComments(ctx context.Context, input platform.Data, reportID string) error {
+func (r *Review) getComments(ctx context.Context) (*PullRequestComments, error) {
+	return r.client.GetComments(ctx)
+}
+
+func (r *Review) addComments(ctx context.Context, input platform.Data, reportID string) error {
 	if len(input.RawDatas) == 0 {
 		return fmt.Errorf("there is no data to comment")
 	}
@@ -109,11 +120,11 @@ func (pr *Review) addComments(ctx context.Context, input platform.Data, reportID
 
 	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
 	for _, comment := range comments {
-		if err := pr.client.PostComment(ctx, comment); err != nil {
+		if err := r.client.PostComment(ctx, comment); err != nil {
 			multiErr = errors.Join(multiErr, err)
 		}
 	}
-	if err := pr.client.BulkUpsertAnnotations(ctx, annotations, reportID); err != nil {
+	if err := r.client.BulkUpsertAnnotations(ctx, annotations, reportID); err != nil {
 		multiErr = errors.Join(multiErr, err)
 	}
 

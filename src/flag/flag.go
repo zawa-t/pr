@@ -69,7 +69,11 @@ func NewValue() (value *Value) {
 	}
 
 	if customTextFormat != "" {
-		value.CustomTextFormat = &customTextFormat
+		if value.InputFormat == "json" { // NOTE: customTextFormat は json 形式の場合のみ利用可能
+			value.CustomTextFormat = &customTextFormat
+		} else {
+			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
+		}
 	}
 
 	if alternativeText != "" {
@@ -90,21 +94,21 @@ func (r *Required) validate() {
 
 	allowedInputFormats := []string{"text", "json"}
 	if !slices.Contains(allowedInputFormats, r.InputFormat) {
-		slog.Error("The specified input-format is not supported.")
+		slog.Error("The specified input-format is not supported.", "input-format", r.InputFormat)
 		os.Exit(1)
 	}
 
 	if r.InputFormat == "json" {
 		allowedNames := []string{"golangci-lint"}
 		if !slices.Contains(allowedNames, r.Name) {
-			slog.Error("The specified tool cannot use json format data.")
+			slog.Error("The specified tool cannot use json format data.", "name", r.Name)
 			os.Exit(1)
 		}
 	}
 
 	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
 	if !slices.Contains(allowedPlatforms, r.Platform) {
-		slog.Error("The specified platform is not supported.")
+		slog.Error("The specified platform is not supported.", "platform", r.Platform)
 		os.Exit(1)
 	}
 }

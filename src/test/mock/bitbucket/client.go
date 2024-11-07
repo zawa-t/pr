@@ -25,6 +25,9 @@ var _ bitbucket.Client = &ClientMock{}
 //			DeleteReportFunc: func(ctx context.Context, reportID string) error {
 //				panic("mock out the DeleteReport method")
 //			},
+//			GetCommentsFunc: func(ctx context.Context) (*bitbucket.PullRequestComments, error) {
+//				panic("mock out the GetComments method")
+//			},
 //			GetReportFunc: func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error) {
 //				panic("mock out the GetReport method")
 //			},
@@ -46,6 +49,9 @@ type ClientMock struct {
 
 	// DeleteReportFunc mocks the DeleteReport method.
 	DeleteReportFunc func(ctx context.Context, reportID string) error
+
+	// GetCommentsFunc mocks the GetComments method.
+	GetCommentsFunc func(ctx context.Context) (*bitbucket.PullRequestComments, error)
 
 	// GetReportFunc mocks the GetReport method.
 	GetReportFunc func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error)
@@ -74,6 +80,11 @@ type ClientMock struct {
 			// ReportID is the reportID argument value.
 			ReportID string
 		}
+		// GetComments holds details about calls to the GetComments method.
+		GetComments []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
 		// GetReport holds details about calls to the GetReport method.
 		GetReport []struct {
 			// Ctx is the ctx argument value.
@@ -100,6 +111,7 @@ type ClientMock struct {
 	}
 	lockBulkUpsertAnnotations sync.RWMutex
 	lockDeleteReport          sync.RWMutex
+	lockGetComments           sync.RWMutex
 	lockGetReport             sync.RWMutex
 	lockPostComment           sync.RWMutex
 	lockUpsertReport          sync.RWMutex
@@ -178,6 +190,38 @@ func (mock *ClientMock) DeleteReportCalls() []struct {
 	mock.lockDeleteReport.RLock()
 	calls = mock.calls.DeleteReport
 	mock.lockDeleteReport.RUnlock()
+	return calls
+}
+
+// GetComments calls GetCommentsFunc.
+func (mock *ClientMock) GetComments(ctx context.Context) (*bitbucket.PullRequestComments, error) {
+	if mock.GetCommentsFunc == nil {
+		panic("ClientMock.GetCommentsFunc: method is nil but Client.GetComments was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockGetComments.Lock()
+	mock.calls.GetComments = append(mock.calls.GetComments, callInfo)
+	mock.lockGetComments.Unlock()
+	return mock.GetCommentsFunc(ctx)
+}
+
+// GetCommentsCalls gets all the calls that were made to GetComments.
+// Check the length with:
+//
+//	len(mockedClient.GetCommentsCalls())
+func (mock *ClientMock) GetCommentsCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockGetComments.RLock()
+	calls = mock.calls.GetComments
+	mock.lockGetComments.RUnlock()
 	return calls
 }
 

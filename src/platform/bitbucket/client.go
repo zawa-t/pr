@@ -1,16 +1,22 @@
 //go:generate moq -rm -out $GOPATH/app/src/test/mock/bitbucket/$GOFILE -pkg mock . Client
 package bitbucket
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Client ...
 type Client interface {
+	GetComments(ctx context.Context) (*PullRequestComments, error)
 	PostComment(ctx context.Context, data CommentData) error
 	UpsertReport(ctx context.Context, reportID string, data ReportData) error
 	GetReport(ctx context.Context, reportID string) (*AnnotationResponse, error)
 	DeleteReport(ctx context.Context, reportID string) error
 	BulkUpsertAnnotations(ctx context.Context, datas []AnnotationData, reportID string) error
 }
+
+// request
 
 // ---------------------
 
@@ -22,6 +28,7 @@ type CommentData struct {
 }
 
 type Content struct {
+	Type   string `json:"type,omitempty"`
 	Raw    string `json:"raw,omitempty"`
 	Markup string `json:"markup,omitempty"`
 	HTML   string `json:"html,omitempty"`
@@ -29,6 +36,7 @@ type Content struct {
 
 type Inline struct {
 	Path string `json:"path,omitempty"`
+	From int    `json:"from,omitempty"`
 	To   uint   `json:"to,omitempty"`
 }
 
@@ -78,4 +86,51 @@ type AnnotationData struct {
 	Link           string `json:"link,omitempty"`
 	CreatedOn      string `json:"created_on,omitempty"`
 	UpdatedOn      string `json:"updated_on,omitempty"`
+}
+
+// response
+// ------------------
+
+type PullRequestComments struct {
+	Size     int       `json:""`
+	Page     int       `json:""`
+	PageLen  int       `json:""`
+	Next     string    `json:""`
+	Previous string    `json:""`
+	Values   []Comment `json:""`
+}
+
+type Comment struct {
+	ID          int         `json:"id"`
+	CreatedOn   time.Time   `json:"created_on"`
+	UpdatedOn   time.Time   `json:"updated_on"`
+	Content     Content     `json:"content"`
+	User        User        `json:"user"`
+	Deleted     bool        `json:"deleted"`
+	Inline      Inline      `json:"inline"`
+	Type        string      `json:"type"`
+	PullRequest PullRequest `json:"pullrequest"`
+	// Resolution  struct {
+	// 	Type string `json:""`
+	// }
+	Pending bool `json:"pending"`
+}
+
+type User struct {
+	Type        string `json:"type"`
+	DisplayName string `json:"display_name"`
+	// Links Link
+	UUID      string `json:"uuid"`
+	AccountID string `json:"account_id"`
+	Nickname  string `json:"nickname"`
+}
+
+// type Link struct {
+
+// }
+
+type PullRequest struct {
+	Type  string `json:"type"`
+	ID    int    `json:"id"`
+	Title string `json:"title"`
 }

@@ -6,10 +6,12 @@ import (
 	"errors"
 )
 
+// PullRequest ...
 type PullRequest struct {
 	Review
 }
 
+// NewPullRequest ...
 func NewPullRequest(r Review) *PullRequest {
 	return &PullRequest{r}
 }
