@@ -32,7 +32,7 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 		return fmt.Errorf("failed to exec r.getComments(): %w", err)
 	}
 
-	fmt.Println(comments)
+	log.PrintJSON("comments", comments)
 
 	if len(input.RawDatas) > 0 {
 		if err := r.addComments(ctx, input, reportID); err != nil {
