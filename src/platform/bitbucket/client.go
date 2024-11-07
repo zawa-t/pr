@@ -8,7 +8,7 @@ import (
 
 // Client ...
 type Client interface {
-	GetComments(ctx context.Context) (*PullRequestComments, error)
+	GetComments(ctx context.Context) ([]Comment, error)
 	PostComment(ctx context.Context, data CommentData) error
 	UpsertReport(ctx context.Context, reportID string, data ReportData) error
 	GetReport(ctx context.Context, reportID string) (*AnnotationResponse, error)
@@ -92,12 +92,12 @@ type AnnotationData struct {
 // ------------------
 
 type PullRequestComments struct {
-	Size     int       `json:""`
-	Page     int       `json:""`
-	PageLen  int       `json:""`
-	Next     string    `json:""`
-	Previous string    `json:""`
-	Values   []Comment `json:""`
+	Size     int       `json:"size"`
+	Page     int       `json:"page"`
+	Pagelen  int       `json:"pagelen"`
+	Next     string    `json:"next,omitempty"`
+	Previous string    `json:"previous"`
+	Values   []Comment `json:"values"`
 }
 
 type Comment struct {

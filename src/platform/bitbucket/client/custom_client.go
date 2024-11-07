@@ -22,38 +22,55 @@ func NewCustomClient(hc http.Client) *customClient {
 	return &customClient{hc}
 }
 
-func (c *customClient) GetComments(ctx context.Context) (*bitbucket.PullRequestComments, error) {
+func (c *customClient) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
 	url, err := http.NewURL(prCommentURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
 	}
 
-	req, err := http.NewRequest(http.Method.GET, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
-	}
-
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
-
-	httpRes, err := c.httpClient.Send(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to exec c.httpClient.Send(): %w", err)
-	}
-
-	if httpRes.StatusCode != 200 {
-		slog.Warn("Failed to retrieve comments.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
-		if httpRes.StatusCode == 404 {
-			return nil, platform.ErrNotFound
+	comments := make([]bitbucket.Comment, 0)
+	for {
+		req, err := http.NewRequest(http.Method.GET, url, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 		}
-		return nil, fmt.Errorf("failed to retrieve comments")
+
+		req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+
+		httpRes, err := c.httpClient.Send(ctx, req)
+		if err != nil {
+			return nil, fmt.Errorf("failed to exec c.httpClient.Send(): %w", err)
+		}
+
+		if httpRes.StatusCode != 200 {
+			slog.Warn("Failed to retrieve comments.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
+			if httpRes.StatusCode == 404 {
+				return nil, platform.ErrNotFound
+			}
+			return nil, fmt.Errorf("failed to retrieve comments")
+		}
+
+		var res bitbucket.PullRequestComments
+		if err := json.Unmarshal(httpRes.Body, &res); err != nil {
+			return nil, fmt.Errorf("failed to exec json.Unmarshal(): %w", err)
+		}
+
+		comments = append(comments, res.Values...)
+
+		if res.Next != "" {
+			url, err = http.NewURL(res.Next)
+			if err != nil {
+				return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
+			}
+			continue
+		} else {
+			break
+		}
 	}
 
-	var res bitbucket.PullRequestComments
-	if err := json.Unmarshal(httpRes.Body, &res); err != nil {
-		return nil, fmt.Errorf("failed to exec json.Unmarshal(): %w", err)
-	}
+	slog.Info(fmt.Sprintf("The total number of comments retrieved from pull request was %d.", len(comments)))
 
-	return &res, nil
+	return comments, nil
 }
 
 func (c *customClient) PostComment(ctx context.Context, data bitbucket.CommentData) error {

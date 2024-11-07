@@ -25,7 +25,7 @@ var _ bitbucket.Client = &ClientMock{}
 //			DeleteReportFunc: func(ctx context.Context, reportID string) error {
 //				panic("mock out the DeleteReport method")
 //			},
-//			GetCommentsFunc: func(ctx context.Context) (*bitbucket.PullRequestComments, error) {
+//			GetCommentsFunc: func(ctx context.Context) ([]bitbucket.Comment, error) {
 //				panic("mock out the GetComments method")
 //			},
 //			GetReportFunc: func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error) {
@@ -51,7 +51,7 @@ type ClientMock struct {
 	DeleteReportFunc func(ctx context.Context, reportID string) error
 
 	// GetCommentsFunc mocks the GetComments method.
-	GetCommentsFunc func(ctx context.Context) (*bitbucket.PullRequestComments, error)
+	GetCommentsFunc func(ctx context.Context) ([]bitbucket.Comment, error)
 
 	// GetReportFunc mocks the GetReport method.
 	GetReportFunc func(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error)
@@ -194,7 +194,7 @@ func (mock *ClientMock) DeleteReportCalls() []struct {
 }
 
 // GetComments calls GetCommentsFunc.
-func (mock *ClientMock) GetComments(ctx context.Context) (*bitbucket.PullRequestComments, error) {
+func (mock *ClientMock) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
 	if mock.GetCommentsFunc == nil {
 		panic("ClientMock.GetCommentsFunc: method is nil but Client.GetComments was just called")
 	}

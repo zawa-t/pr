@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/zawa-t/pr-commentator/src/log"
 	"github.com/zawa-t/pr-commentator/src/platform"
@@ -26,13 +27,6 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 	if err := r.createReport(ctx, input, reportID); err != nil {
 		return fmt.Errorf("failed to exec r.createReport(): %w", err)
 	}
-
-	comments, err := r.getComments(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to exec r.getComments(): %w", err)
-	}
-
-	log.PrintJSON("comments", comments)
 
 	if len(input.RawDatas) > 0 {
 		if err := r.addComments(ctx, input, reportID); err != nil {
@@ -73,7 +67,7 @@ func (r *Review) createReport(ctx context.Context, input platform.Data, reportID
 	return nil
 }
 
-func (r *Review) getComments(ctx context.Context) (*PullRequestComments, error) {
+func (r *Review) getComments(ctx context.Context) ([]Comment, error) {
 	return r.client.GetComments(ctx)
 }
 
@@ -82,7 +76,19 @@ func (r *Review) addComments(ctx context.Context, input platform.Data, reportID 
 		return fmt.Errorf("there is no data to comment")
 	}
 
-	comments := make([]CommentData, len(input.RawDatas))
+	cs, err := r.getComments(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to exec r.getComments(): %w", err)
+	}
+
+	s := make([]string, 0)
+	for _, v := range cs {
+		if !v.Deleted {
+			s = append(s, fmt.Sprintf("%s:%d:%s", v.Inline.Path, v.Inline.To, v.Content.Raw))
+		}
+	}
+
+	comments := make([]CommentData, 0)
 	annotations := make([]AnnotationData, len(input.RawDatas))
 
 	for i, data := range input.RawDatas {
@@ -93,14 +99,17 @@ func (r *Review) addComments(ctx context.Context, input platform.Data, reportID 
 			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
 		}
 
-		comments[i] = CommentData{
-			Content: Content{
-				Raw: text,
-			},
-			Inline: Inline{
-				Path: data.FilePath,
-				To:   data.LineNum,
-			},
+		// NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしない
+		if !slices.Contains(s, fmt.Sprintf("%s:%d:%s", data.FilePath, data.LineNum, text)) {
+			comments = append(comments, CommentData{
+				Content: Content{
+					Raw: text,
+				},
+				Inline: Inline{
+					Path: data.FilePath,
+					To:   data.LineNum,
+				},
+			})
 		}
 
 		annotations[i] = AnnotationData{
@@ -116,7 +125,7 @@ func (r *Review) addComments(ctx context.Context, input platform.Data, reportID 
 	}
 
 	log.PrintJSON("[]CommentData", comments)
-	log.PrintJSON("[]AnnotationData", comments)
+	log.PrintJSON("[]AnnotationData", annotations)
 
 	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
 	for _, comment := range comments {

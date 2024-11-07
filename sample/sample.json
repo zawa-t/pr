@@ -11,6 +11,23 @@
 			"Pos": {
 				"Filename": "main.go",
 				"Offset": 3632,
+				"Line": 25,
+				"Column": 40
+			},
+			"ExpectNoLint": false,
+			"ExpectedNoLintLinter": ""
+		},
+		{
+			"FromLinter": "unparam",
+			"Text": "`connectionNameRules` - `fieldName` always receives `\"name\"`",
+			"Severity": "",
+			"SourceLines": [
+				"func connectionNameRules(name *string, fieldName string) *validation.FieldRules {"
+			],
+			"Replacement": null,
+			"Pos": {
+				"Filename": "main.go",
+				"Offset": 3632,
 				"Line": 29,
 				"Column": 40
 			},
