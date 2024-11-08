@@ -68,7 +68,7 @@ func main() {
 	}
 	log.PrintJSON("platform.Data", data)
 
-	if err := newPullRequest(flagValue.Platform).AddComments(context.Background(), data); err != nil {
+	if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), data); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}
@@ -76,8 +76,8 @@ func main() {
 	slog.Info("The pull request comments were successfully added.")
 }
 
-func newPullRequest(pf string) (pr *platform.PullRequest) {
-	switch pf {
+func newPullRequest(platformName string) (pr *platform.PullRequest) {
+	switch platformName {
 	case platform.Bitbucket:
 		if env.Env.IsLocal() {
 			pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))

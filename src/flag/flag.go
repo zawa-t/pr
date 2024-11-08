@@ -13,7 +13,7 @@ import (
 var usage = "Usage: pr-commentator --name=[tool name] --input-format=[input format] --platform=[platform name] < inputfile"
 
 type Required struct {
-	Name, InputFormat, Platform string
+	Name, InputFormat, PlatformName string
 }
 
 type Optional struct {
@@ -63,9 +63,9 @@ func NewValue() (value *Value) {
 
 	value = &Value{
 		Required: Required{
-			Name:        name,
-			InputFormat: inputFormat,
-			Platform:    platform,
+			Name:         name,
+			InputFormat:  inputFormat,
+			PlatformName: platform,
 		},
 	}
 
@@ -88,7 +88,7 @@ func NewValue() (value *Value) {
 }
 
 func (r *Required) validate() {
-	if r.Name == "" || r.InputFormat == "" || r.Platform == "" {
+	if r.Name == "" || r.InputFormat == "" || r.PlatformName == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
@@ -108,8 +108,8 @@ func (r *Required) validate() {
 	}
 
 	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
-	if !slices.Contains(allowedPlatforms, r.Platform) {
-		slog.Error("The specified platform is not supported.", "platform", r.Platform)
+	if !slices.Contains(allowedPlatforms, r.PlatformName) {
+		slog.Error("The specified platform is not supported.", "platform", r.PlatformName)
 		os.Exit(1)
 	}
 }
