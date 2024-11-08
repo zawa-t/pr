@@ -62,14 +62,12 @@ func (c *customClient) GetComments(ctx context.Context) ([]bitbucket.Comment, er
 			if err != nil {
 				return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
 			}
-			continue
 		} else {
 			break
 		}
 	}
 
-	slog.Info(fmt.Sprintf("The total number of comments retrieved from pull request was %d.", len(comments)))
-
+	slog.Debug(fmt.Sprintf("The total number of comments retrieved from pull request: %d.", len(comments)))
 	return comments, nil
 }
 

@@ -11,7 +11,7 @@
 			"Pos": {
 				"Filename": "main.go",
 				"Offset": 3632,
-				"Line": 25,
+				"Line": 22,
 				"Column": 40
 			},
 			"ExpectNoLint": false,

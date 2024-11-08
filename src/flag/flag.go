@@ -6,6 +6,7 @@ import (
 	"os"
 	"slices"
 
+	"github.com/zawa-t/pr-commentator/src/format"
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
@@ -69,7 +70,7 @@ func NewValue() (value *Value) {
 	}
 
 	if customTextFormat != "" {
-		if value.InputFormat == "json" { // NOTE: customTextFormat は json 形式の場合のみ利用可能
+		if value.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
 			value.CustomTextFormat = &customTextFormat
 		} else {
 			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
@@ -92,13 +93,13 @@ func (r *Required) validate() {
 		os.Exit(1)
 	}
 
-	allowedInputFormats := []string{"text", "json"}
+	allowedInputFormats := []string{format.Text, format.JSON}
 	if !slices.Contains(allowedInputFormats, r.InputFormat) {
 		slog.Error("The specified input-format is not supported.", "input-format", r.InputFormat)
 		os.Exit(1)
 	}
 
-	if r.InputFormat == "json" {
+	if r.InputFormat == format.JSON {
 		allowedNames := []string{"golangci-lint"}
 		if !slices.Contains(allowedNames, r.Name) {
 			slog.Error("The specified tool cannot use json format data.", "name", r.Name)
