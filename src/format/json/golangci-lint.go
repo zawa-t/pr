@@ -1,41 +1,46 @@
-package golangci
+package json
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr-commentator/src/flag"
-
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
-func MakeInputDatas(flagValue flag.Value, stdin *os.File) (datas []platform.Raw) {
-	switch flagValue.InputFormat {
-	case "txt":
-		// input.Datas = readText(*flagValue)
-	case "json":
-		jsonData := decodeJSONData(stdin)
-		if flagValue.AlternativeText != nil {
-			jsonData.Issues = replaceText(*flagValue.AlternativeText, jsonData.Issues)
-		}
-		datas = makeInputDatas(flagValue.CustomTextFormat, jsonData.Issues)
-	default:
-		slog.Error("The specified input-format could not be processed because it is not supported.")
-		os.Exit(1)
-	}
-	return
+type GolangciLintJSON struct {
+	Issues []Issue `json:"Issues"`
 }
 
-func replaceText(alternativeText string, issues []Issue) []Issue {
-	for i, v := range issues {
-		v.Text = alternativeText
-		issues[i] = v
-	}
+type Issue struct {
+	FromLinter  string   `json:"FromLinter"`
+	Text        string   `json:"Text"`
+	Severity    string   `json:"Severity"`
+	SourceLines []string `json:"SourceLines"`
+	// Replacement ? // NOTE: 型や使用方法が不明のため一旦コメントアウト
+	Pos          Pos  `json:"Pos"`
+	ExpectNoLint bool `json:"ExpectNoLint"`
+}
 
-	return issues
+type Pos struct {
+	Filename             string `json:"Filename"`
+	Offset               uint   `json:"Offset"`
+	Line                 uint   `json:"Line"`
+	Column               uint   `json:"Column"`
+	ExpectedNoLintLinter string `json:"ExpectedNoLintLinter"`
+}
+
+func decodeGolangciLintJSON(stdin *os.File) GolangciLintJSON {
+	var jsonData GolangciLintJSON
+	decoder := json.NewDecoder(stdin)
+	if err := decoder.Decode(&jsonData); err != nil {
+		slog.Error("Failed to JSON Decode.", "error", err.Error())
+		os.Exit(1)
+	}
+	return jsonData
 }
 
 func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Raw {

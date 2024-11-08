@@ -6,13 +6,14 @@ import (
 	"os"
 	"slices"
 
+	"github.com/zawa-t/pr-commentator/src/format"
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
 var usage = "Usage: pr-commentator --name=[tool name] --input-format=[input format] --platform=[platform name] < inputfile"
 
 type Required struct {
-	Name, InputFormat, Platform string
+	Name, InputFormat, PlatformName string
 }
 
 type Optional struct {
@@ -62,14 +63,14 @@ func NewValue() (value *Value) {
 
 	value = &Value{
 		Required: Required{
-			Name:        name,
-			InputFormat: inputFormat,
-			Platform:    platform,
+			Name:         name,
+			InputFormat:  inputFormat,
+			PlatformName: platform,
 		},
 	}
 
 	if customTextFormat != "" {
-		if value.InputFormat == "json" { // NOTE: customTextFormat は json 形式の場合のみ利用可能
+		if value.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
 			value.CustomTextFormat = &customTextFormat
 		} else {
 			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
@@ -87,18 +88,18 @@ func NewValue() (value *Value) {
 }
 
 func (r *Required) validate() {
-	if r.Name == "" || r.InputFormat == "" || r.Platform == "" {
+	if r.Name == "" || r.InputFormat == "" || r.PlatformName == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
 
-	allowedInputFormats := []string{"text", "json"}
+	allowedInputFormats := []string{format.Text, format.JSON}
 	if !slices.Contains(allowedInputFormats, r.InputFormat) {
 		slog.Error("The specified input-format is not supported.", "input-format", r.InputFormat)
 		os.Exit(1)
 	}
 
-	if r.InputFormat == "json" {
+	if r.InputFormat == format.JSON {
 		allowedNames := []string{"golangci-lint"}
 		if !slices.Contains(allowedNames, r.Name) {
 			slog.Error("The specified tool cannot use json format data.", "name", r.Name)
@@ -107,8 +108,8 @@ func (r *Required) validate() {
 	}
 
 	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
-	if !slices.Contains(allowedPlatforms, r.Platform) {
-		slog.Error("The specified platform is not supported.", "platform", r.Platform)
+	if !slices.Contains(allowedPlatforms, r.PlatformName) {
+		slog.Error("The specified platform is not supported.", "platform", r.PlatformName)
 		os.Exit(1)
 	}
 }

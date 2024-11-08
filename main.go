@@ -7,8 +7,9 @@ import (
 
 	"github.com/zawa-t/pr-commentator/src/env"
 	"github.com/zawa-t/pr-commentator/src/flag"
-	"github.com/zawa-t/pr-commentator/src/linter/golangci"
-	"github.com/zawa-t/pr-commentator/src/linter/txt"
+	"github.com/zawa-t/pr-commentator/src/format"
+	"github.com/zawa-t/pr-commentator/src/format/json"
+	"github.com/zawa-t/pr-commentator/src/format/text"
 	"github.com/zawa-t/pr-commentator/src/log"
 	"github.com/zawa-t/pr-commentator/src/platform"
 	"github.com/zawa-t/pr-commentator/src/platform/bitbucket"
@@ -23,7 +24,7 @@ import (
 以下、動作確認用コマンド
 ```
 $ go build -o pr-commentator
-$ ./pr-commentator -n=golangci-lint -ext=json --platform=bitbucket < sample/sample.json
+$ ./pr-commentator -n=golangci-lint -f=json --platform=bitbucket < sample/sample.json
 ```
 */
 
@@ -32,6 +33,7 @@ TODO:
 ・textフォーマット使用時にカラム指定ができるようにする（コロン3つでも対応可能にする）
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）
 ・httpパッケージまわりの整備
+・BitbucketのGetComment()の並行処理化
 */
 
 func main() {
@@ -56,19 +58,17 @@ func main() {
 	}
 
 	switch flagValue.InputFormat {
-	case "json":
-		if flagValue.Name == "golangci-lint" {
-			data.RawDatas = golangci.MakeInputDatas(*flagValue, stdin)
-		}
-	case "text":
-		data.RawDatas = txt.Read(*flagValue, stdin)
+	case format.JSON:
+		data.RawDatas = json.Decode(*flagValue, stdin)
+	case format.Text:
+		data.RawDatas = text.Read(*flagValue, stdin)
 	default:
 		slog.Error("The specified input-format is not supported.")
 		os.Exit(1)
 	}
 	log.PrintJSON("platform.Data", data)
 
-	if err := newPullRequest(flagValue.Platform).AddComments(context.Background(), data); err != nil {
+	if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), data); err != nil {
 		slog.Error("Failed to add comments.", "error", err.Error())
 		os.Exit(1)
 	}
@@ -76,8 +76,8 @@ func main() {
 	slog.Info("The pull request comments were successfully added.")
 }
 
-func newPullRequest(pf string) (pr *platform.PullRequest) {
-	switch pf {
+func newPullRequest(platformName string) (pr *platform.PullRequest) {
+	switch platformName {
 	case platform.Bitbucket:
 		if env.Env.IsLocal() {
 			pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))
