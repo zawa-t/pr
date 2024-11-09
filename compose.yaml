@@ -2,12 +2,12 @@ services:
   backend:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.commentator
     image: pr-commentator-img
     container_name: pr-commentator
     volumes:
-      - ./:/go/app
+      - ./commentator:/go/app
     env_file:
-      - .env
+      - ./commentator/.env
     tty: true
     stdin_open: true
