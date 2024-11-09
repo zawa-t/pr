@@ -70,7 +70,7 @@ func (r *Review) AddReviewComments(ctx context.Context, input platform.Data) err
 	}
 
 	data := ReviewData{
-		Body:     "xxxxxxxx",
+		Body:     "yyyyy",
 		Event:    "REQUEST_CHANGES",
 		Comments: comments,
 	}
