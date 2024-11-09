@@ -5,7 +5,7 @@ package mock
 
 import (
 	"context"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
 	"sync"
 )
 

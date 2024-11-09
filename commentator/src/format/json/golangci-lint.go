@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr-commentator/commentator/src/platform"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
 )
 
 type GolangciLintJSON struct {

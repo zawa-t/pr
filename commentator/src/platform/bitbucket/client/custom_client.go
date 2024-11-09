@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/zawa-t/pr-commentator/commentator/src/env"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform/bitbucket"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform/http"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform/http/url"
+	"github.com/zawa-t/pr-reviewer/commentator/src/env"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform/bitbucket"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http/url"
 )
 
 // customClient provides client for HTTP request.

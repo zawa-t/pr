@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/zawa-t/pr-commentator/commentator/src/env"
-	"github.com/zawa-t/pr-commentator/commentator/src/log"
-	"github.com/zawa-t/pr-commentator/commentator/src/platform"
+	"github.com/zawa-t/pr-reviewer/commentator/src/env"
+	"github.com/zawa-t/pr-reviewer/commentator/src/log"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
 )
 
 // Review ...
