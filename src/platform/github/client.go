@@ -46,3 +46,52 @@ type Comment struct {
 	StartLine uint   `json:"start_line,omitempty"` // example:1
 	StartSide string `json:"start_side,omitempty"` // example:"RIGHT" LEFT, RIGHT, side
 }
+
+// --------------------
+
+// POSTCheckRuns ...
+// 参考：https://docs.github.com/ja/rest/checks/runs?apiVersion=2022-11-28
+type POSTCheckRuns struct {
+	Name        string          `json:"name"`                   // example:
+	HeadSHA     string          `json:"head_sha"`               // example:
+	DetailsURL  string          `json:"details_url,omitempty"`  // example:
+	ExternalID  string          `json:"external_id,omitempty"`  // example:
+	Status      string          `json:"status,omitempty"`       // example:, queued, in_progress, completed, waiting, requested, pending
+	StartedAt   string          `json:"started_at,omitempty"`   // example:
+	Conclusion  string          `json:"conclusion,omitempty"`   // example:, action_required, cancelled, failure, neutral, success, skipped, stale, timed_out
+	CompletedAt string          `json:"completed_at,omitempty"` // example:
+	Output      CheckRunsOutput `json:"output,omitempty"`       // example:
+	Actions     []Action        `json:"actions,omitempty"`      // example:
+}
+
+type CheckRunsOutput struct {
+	Title       string       `json:"title"`                 // example:
+	Summary     string       `json:"summary"`               // example:
+	Text        string       `json:"text,omitempty"`        // example:
+	Annotations []Annotation `json:"annotations,omitempty"` // example:
+	Images      []Image      `json:"images,omitempty"`      // example:
+}
+
+type Annotation struct {
+	Path            string `json:"path"`                   // example:
+	StartLine       int    `json:"start_line"`             // example:
+	EndLine         int    `json:"end_line"`               // example:
+	StartColumn     int    `json:"start_column,omitempty"` // example:
+	EndColumn       int    `json:"end_column,omitempty"`   // example:
+	AnnotationLevel string `json:"annotation_level"`       // example:, notice, warning, failure
+	Message         string `json:"message"`                // example:
+	Title           string `json:"title,omitempty"`        // example:
+	RawDetails      string `json:"raw_details,omitempty"`  // example:
+}
+
+type Image struct {
+	Alt      string `json:"alt"`               // example:
+	ImageURL string `json:"image_url"`         // example:
+	Caption  string `json:"caption,omitempty"` // example:
+}
+
+type Action struct {
+	Label       string `json:"label"`       // example:
+	Description string `json:"description"` // example:
+	Identifier  string `json:"identifier"`  // example:
+}
