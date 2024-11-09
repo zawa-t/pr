@@ -38,8 +38,10 @@ jobs:
 
       - name: Build Test
         # if: ${{ github.event_name == 'push' }}
+        working-directory: ./app
         run: go build -v ./...
 
       - name: Unit Test
         # if: ${{ github.event_name == 'push' }}
+        working-directory: ./app
         run: go test -v ./...
