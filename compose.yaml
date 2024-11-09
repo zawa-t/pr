@@ -1,10 +1,10 @@
 services:
-  backend:
+  pr-commentator:
     build:
       context: ./
       dockerfile: Dockerfile.commentator
-    image: pr-commentator-img
-    container_name: pr-commentator
+    image: commentator-img
+    container_name: commentator
     volumes:
       - ./commentator:/go/app
     env_file:
