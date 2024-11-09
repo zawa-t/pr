@@ -26,6 +26,7 @@ runs:
 
     - name: Run golangci-lint with reviewdog (GitHub PullRequest review comment)
       shell: bash
+      working-directory: ./app
       continue-on-error: true
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ env.REVIEWDOG_PAT }}
