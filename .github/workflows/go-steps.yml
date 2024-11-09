@@ -39,10 +39,8 @@ jobs:
 
       - name: Build Test
         # if: ${{ github.event_name == 'push' }}
-        # working-directory: /commentator
         run: go build -v ./...
 
       - name: Unit Test
         # if: ${{ github.event_name == 'push' }}
-        # working-directory: /commentator
         run: go test -v ./...
