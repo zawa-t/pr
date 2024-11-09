@@ -12,9 +12,11 @@ var baseURL = fmt.Sprintf("https://api.github.com/repos/%s/%s", env.GithubReposi
 var (
 	prCommentPath = fmt.Sprintf("/pulls/%s/comments", env.GithubPullRequestNumber)
 	prReviewPath  = fmt.Sprintf("/pulls/%s/reviews", env.GithubPullRequestNumber)
+	checkRunPath  = "/check-runs"
 )
 
 var (
 	prCommentURL = url.JoinPathWithNoError(baseURL, prCommentPath)
 	prReviewURL  = url.JoinPathWithNoError(baseURL, prReviewPath)
+	checkRunURL  = url.JoinPathWithNoError(baseURL, checkRunPath)
 )
