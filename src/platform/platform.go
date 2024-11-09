@@ -24,14 +24,15 @@ type Review interface {
 // Data ...
 type Data struct {
 	Name     string
-	RawDatas []Raw
+	Contents []Content
 }
 
-// Raw ...
-type Raw struct {
+// Content ...
+type Content struct {
 	Linter            string
 	FilePath          string
 	LineNum           uint
+	ColumnNum         uint
 	Message           string
 	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
 }

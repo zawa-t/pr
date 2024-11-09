@@ -8,14 +8,14 @@ import (
 	"github.com/zawa-t/pr-commentator/src/platform"
 )
 
-func Decode(flagValue flag.Value, stdin *os.File) (datas []platform.Raw) {
+func Decode(flagValue flag.Value, stdin *os.File) (contents []platform.Content) {
 	switch flagValue.Name {
 	case "golangci-lint":
 		jsonData := decodeGolangciLintJSON(stdin)
 		if flagValue.AlternativeText != nil {
 			jsonData.Issues = replaceText(*flagValue.AlternativeText, jsonData.Issues)
 		}
-		datas = makeInputDatas(flagValue.CustomTextFormat, jsonData.Issues)
+		contents = makeContents(flagValue.CustomTextFormat, jsonData.Issues)
 	}
 	return
 }

@@ -17,8 +17,8 @@ type Required struct {
 }
 
 type Optional struct {
-	CustomTextFormat, AlternativeText *string
-	Local                             bool
+	CustomTextFormat, AlternativeText, ErrorFormat *string
+	Local                                          bool
 }
 
 type Value struct {
@@ -59,6 +59,9 @@ func NewValue() (value *Value) {
 	var local bool
 	flag.BoolVar(&local, "local", false, "The flag is optional.")
 
+	var errorFormat string
+	flag.StringVar(&errorFormat, "efm", "", "Error format pattern. %f:%l:%c: %m")
+
 	flag.Parse()
 
 	value = &Value{
@@ -81,35 +84,44 @@ func NewValue() (value *Value) {
 		value.AlternativeText = &alternativeText
 	}
 
+	if errorFormat != "" {
+		value.ErrorFormat = &errorFormat
+	}
+
 	value.Local = local
 
 	value.validate()
 	return
 }
 
-func (r *Required) validate() {
-	if r.Name == "" || r.InputFormat == "" || r.PlatformName == "" {
+func (v *Value) validate() {
+	if v.Name == "" || v.InputFormat == "" || v.PlatformName == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
 
 	allowedInputFormats := []string{format.Text, format.JSON}
-	if !slices.Contains(allowedInputFormats, r.InputFormat) {
-		slog.Error("The specified input-format is not supported.", "input-format", r.InputFormat)
+	if !slices.Contains(allowedInputFormats, v.InputFormat) {
+		slog.Error("The specified input-format is not supported.", "input-format", v.InputFormat)
 		os.Exit(1)
 	}
 
-	if r.InputFormat == format.JSON {
+	if v.InputFormat == format.Text && v.ErrorFormat == nil {
+		slog.Error("If the input-format flag is text, efm flag must be specified.")
+		os.Exit(1)
+	}
+
+	if v.InputFormat == format.JSON {
 		allowedNames := []string{"golangci-lint"}
-		if !slices.Contains(allowedNames, r.Name) {
-			slog.Error("The specified tool cannot use json format data.", "name", r.Name)
+		if !slices.Contains(allowedNames, v.Name) {
+			slog.Error("The specified tool cannot use json format data.", "name", v.Name)
 			os.Exit(1)
 		}
 	}
 
 	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
-	if !slices.Contains(allowedPlatforms, r.PlatformName) {
-		slog.Error("The specified platform is not supported.", "platform", r.PlatformName)
+	if !slices.Contains(allowedPlatforms, v.PlatformName) {
+		slog.Error("The specified platform is not supported.", "platform", v.PlatformName)
 		os.Exit(1)
 	}
 }

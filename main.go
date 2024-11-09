@@ -10,7 +10,6 @@ import (
 	"github.com/zawa-t/pr-commentator/src/format"
 	"github.com/zawa-t/pr-commentator/src/format/json"
 	"github.com/zawa-t/pr-commentator/src/format/text"
-	"github.com/zawa-t/pr-commentator/src/log"
 	"github.com/zawa-t/pr-commentator/src/platform"
 	"github.com/zawa-t/pr-commentator/src/platform/bitbucket"
 	bitbucketClient "github.com/zawa-t/pr-commentator/src/platform/bitbucket/client"
@@ -30,7 +29,8 @@ $ ./pr-commentator -n=golangci-lint -f=json --platform=bitbucket < sample/sample
 
 /*
 TODO:
-・textフォーマット使用時にカラム指定ができるようにする（コロン3つでも対応可能にする）
+・githubにanotationコメントを入れられるようにする
+・githubも同じコメントは1回しか入らないようにする
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）
 ・httpパッケージまわりの整備
 ・BitbucketのGetComment()の並行処理化
@@ -52,28 +52,29 @@ func main() {
 	}
 
 	flagValue := flag.NewValue()
+	if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), newData(*flagValue, stdin)); err != nil {
+		slog.Error("Failed to add comments.", "error", err.Error())
+		os.Exit(1)
+	}
 
+	slog.Info("The pull request comments were successfully added.")
+}
+
+func newData(flagValue flag.Value, stdin *os.File) platform.Data {
 	data := platform.Data{
 		Name: flagValue.Name,
 	}
 
 	switch flagValue.InputFormat {
 	case format.JSON:
-		data.RawDatas = json.Decode(*flagValue, stdin)
+		data.Contents = json.Decode(flagValue, stdin)
 	case format.Text:
-		data.RawDatas = text.Read(*flagValue, stdin)
+		data.Contents = text.Read(flagValue, stdin)
 	default:
 		slog.Error("The specified input-format is not supported.")
 		os.Exit(1)
 	}
-	log.PrintJSON("platform.Data", data)
-
-	if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), data); err != nil {
-		slog.Error("Failed to add comments.", "error", err.Error())
-		os.Exit(1)
-	}
-
-	slog.Info("The pull request comments were successfully added.")
+	return data
 }
 
 func newPullRequest(platformName string) (pr *platform.PullRequest) {

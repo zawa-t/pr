@@ -27,7 +27,7 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 		return fmt.Errorf("failed to exec r.createReport(): %w", err)
 	}
 
-	if len(input.RawDatas) > 0 {
+	if len(input.Contents) > 0 {
 		if err := r.addAnnotations(ctx, input, reportID); err != nil {
 			return fmt.Errorf("failed to exec r.addAnnotations(): %w", err)
 		}
@@ -46,7 +46,7 @@ func (r *Review) createReport(ctx context.Context, input platform.Data, reportID
 		ReportType: "TEST",
 	}
 
-	if len(input.RawDatas) == 0 {
+	if len(input.Contents) == 0 {
 		reportData.Result = "PASSED"
 	} else {
 		reportData.Result = "FAILED"
@@ -70,12 +70,12 @@ func (r *Review) createReport(ctx context.Context, input platform.Data, reportID
 }
 
 func (r *Review) addAnnotations(ctx context.Context, input platform.Data, reportID string) error {
-	if len(input.RawDatas) == 0 {
+	if len(input.Contents) == 0 {
 		return fmt.Errorf("there is no data to annotation")
 	}
 
-	annotations := make([]AnnotationData, len(input.RawDatas))
-	for i, data := range input.RawDatas {
+	annotations := make([]AnnotationData, len(input.Contents))
+	for i, data := range input.Contents {
 		annotations[i] = AnnotationData{
 			ExternalID:     fmt.Sprintf("pr-commentator-%03d", i+1), // NOTE: bulk annotations で一度に作成できるのは MAX 100件まで
 			Path:           data.FilePath,
@@ -95,7 +95,7 @@ func (r *Review) addAnnotations(ctx context.Context, input platform.Data, report
 }
 
 func (r *Review) addComments(ctx context.Context, input platform.Data) error {
-	if len(input.RawDatas) == 0 {
+	if len(input.Contents) == 0 {
 		return fmt.Errorf("there is no data to comment")
 	}
 
@@ -112,23 +112,23 @@ func (r *Review) addComments(ctx context.Context, input platform.Data) error {
 	}
 
 	comments := make([]CommentData, 0)
-	for _, data := range input.RawDatas {
+	for _, content := range input.Contents {
 		var text string
-		if data.CustomCommentText != nil {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *data.CustomCommentText)
+		if content.CustomCommentText != nil {
+			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *content.CustomCommentText)
 		} else {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
+			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", content.FilePath, content.LineNum, content.Linter, content.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
 		}
 
-		commentID := fmt.Sprintf("%s:%d:%s", data.FilePath, data.LineNum, text)
+		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, text)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments = append(comments, CommentData{
 				Content: Content{
 					Raw: text,
 				},
 				Inline: Inline{
-					Path: data.FilePath,
-					To:   data.LineNum,
+					Path: content.FilePath,
+					To:   content.LineNum,
 				},
 			})
 		}

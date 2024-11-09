@@ -43,10 +43,10 @@ func decodeGolangciLintJSON(stdin *os.File) GolangciLintJSON {
 	return jsonData
 }
 
-func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Raw {
-	datas := make([]platform.Raw, 0)
+func makeContents(customTextFormat *string, issues []Issue) []platform.Content {
+	contents := make([]platform.Content, 0)
 	for _, v := range issues {
-		data := platform.Raw{
+		data := platform.Content{
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,
@@ -68,7 +68,7 @@ func makeInputDatas(customTextFormat *string, issues []Issue) []platform.Raw {
 			text := result.String()
 			data.CustomCommentText = &text // NOTE: 利用者から指定されたテキストに置き換え
 		}
-		datas = append(datas, data)
+		contents = append(contents, data)
 	}
-	return datas
+	return contents
 }

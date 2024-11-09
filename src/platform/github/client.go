@@ -6,6 +6,7 @@ import "context"
 // Client ...
 type Client interface {
 	CreateComment(ctx context.Context, data CommentData) error
+	CreateReview(ctx context.Context, data ReviewData) error
 }
 
 // --------------------
@@ -23,4 +24,25 @@ type CommentData struct {
 	Position    uint   `json:"position,omitempty"`     // example:"RIGHT"
 	InReplyTo   uint   `json:"in_reply_to,omitempty"`  // example:"RIGHT"
 	SubjectType string `json:"subject_type,omitempty"` // example:"RIGHT" line, file
+}
+
+// --------------------
+
+// ReviewData ...
+// 参考：https://docs.github.com/ja/rest/pulls/reviews?apiVersion=2022-11-28#create-a-review-for-a-pull-request--code-samples
+type ReviewData struct {
+	CommitID string    `json:"commit_id,omitempty"` // example:"6dcb09b5b57875f334f61aebed695e2e4193db5e"
+	Body     string    `json:"body,omitempty"`      // example:"Great stuff!"
+	Event    string    `json:"event,omitempty"`     // example:"file1.txt", APPROVE, REQUEST_CHANGES, or COMMENT
+	Comments []Comment `json:"comments,omitempty"`
+}
+
+type Comment struct {
+	Path      string `json:"path"`                 // example:"file1.txt"
+	Position  uint   `json:"position,omitempty"`   // example:"RIGHT"
+	Body      string `json:"body"`                 // example:"Great stuff!"
+	Line      uint   `json:"line,omitempty"`       // example:2  ※ Required unless using subject_type:file
+	Side      string `json:"side,omitempty"`       // example:"RIGHT" ※LEFT, RIGHT
+	StartLine uint   `json:"start_line,omitempty"` // example:1
+	StartSide string `json:"start_side,omitempty"` // example:"RIGHT" LEFT, RIGHT, side
 }

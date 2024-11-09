@@ -10,6 +10,7 @@ import (
 	"github.com/zawa-t/pr-commentator/src/platform"
 	"github.com/zawa-t/pr-commentator/src/platform/bitbucket"
 	"github.com/zawa-t/pr-commentator/src/platform/http"
+	"github.com/zawa-t/pr-commentator/src/platform/http/url"
 )
 
 // customClient provides client for HTTP request.
@@ -23,14 +24,14 @@ func NewCustomClient(hc http.Client) *customClient {
 }
 
 func (c *customClient) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
-	url, err := http.NewURL(prCommentURL)
+	parsedURL, err := url.New(prCommentURL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return nil, fmt.Errorf("failed to exec url.New(): %w", err)
 	}
 
 	comments := make([]bitbucket.Comment, 0)
 	for {
-		req, err := http.NewRequest(http.Method.GET, url, nil)
+		req, err := http.NewRequest(http.Method.GET, parsedURL, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 		}
@@ -58,7 +59,7 @@ func (c *customClient) GetComments(ctx context.Context) ([]bitbucket.Comment, er
 		comments = append(comments, res.Values...)
 
 		if res.Next != "" {
-			url, err = http.NewURL(res.Next)
+			parsedURL, err = url.New(res.Next)
 			if err != nil {
 				return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
 			}
@@ -72,12 +73,12 @@ func (c *customClient) GetComments(ctx context.Context) ([]bitbucket.Comment, er
 }
 
 func (c *customClient) PostComment(ctx context.Context, data bitbucket.CommentData) error {
-	url, err := http.NewURL(prCommentURL)
+	parsedURL, err := url.New(prCommentURL)
 	if err != nil {
-		return fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return fmt.Errorf("failed to exec url.New(): %w", err)
 	}
 
-	req, err := http.NewRequest(http.Method.POST, url, data)
+	req, err := http.NewRequest(http.Method.POST, parsedURL, data)
 	if err != nil {
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
@@ -99,12 +100,12 @@ func (c *customClient) PostComment(ctx context.Context, data bitbucket.CommentDa
 }
 
 func (c *customClient) UpsertReport(ctx context.Context, reportID string, data bitbucket.ReportData) error {
-	url, err := http.NewURL(reportURL(reportID))
+	parsedURL, err := url.New(reportURL(reportID))
 	if err != nil {
-		return fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return fmt.Errorf("failed to exec url.New(): %w", err)
 	}
 
-	req, err := http.NewRequest(http.Method.PUT, url, data)
+	req, err := http.NewRequest(http.Method.PUT, parsedURL, data)
 	if err != nil {
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
@@ -126,12 +127,12 @@ func (c *customClient) UpsertReport(ctx context.Context, reportID string, data b
 }
 
 func (c *customClient) GetReport(ctx context.Context, reportID string) (*bitbucket.AnnotationResponse, error) {
-	url, err := http.NewURL(reportURL(reportID))
+	parsedURL, err := url.New(reportURL(reportID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return nil, fmt.Errorf("failed to exec url.New(): %w", err)
 	}
 
-	req, err := http.NewRequest(http.Method.GET, url, nil)
+	req, err := http.NewRequest(http.Method.GET, parsedURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
@@ -160,12 +161,12 @@ func (c *customClient) GetReport(ctx context.Context, reportID string) (*bitbuck
 }
 
 func (c *customClient) DeleteReport(ctx context.Context, reportID string) error {
-	url, err := http.NewURL(reportURL(reportID))
+	parsedURL, err := url.New(reportURL(reportID))
 	if err != nil {
-		return fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return fmt.Errorf("failed to exec url.New(): %w", err)
 	}
 
-	req, err := http.NewRequest(http.Method.DELETE, url, nil)
+	req, err := http.NewRequest(http.Method.DELETE, parsedURL, nil)
 	if err != nil {
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
@@ -186,12 +187,13 @@ func (c *customClient) DeleteReport(ctx context.Context, reportID string) error 
 }
 
 func (c *customClient) BulkUpsertAnnotations(ctx context.Context, datas []bitbucket.AnnotationData, reportID string) error {
-	url, err := http.NewURL(bulkAnnotationsURL(reportID))
+	parsedURL, err := url.New(bulkAnnotationsURL(reportID))
 	if err != nil {
-		return fmt.Errorf("failed to exec http.NewURL(): %w", err)
+		return fmt.Errorf("failed to exec url.New(): %w", err)
 	}
+	fmt.Println(parsedURL.String())
 
-	req, err := http.NewRequest(http.Method.POST, url, datas)
+	req, err := http.NewRequest(http.Method.POST, parsedURL, datas)
 	if err != nil {
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}

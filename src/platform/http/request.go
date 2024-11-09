@@ -3,13 +3,14 @@ package http
 import (
 	"bytes"
 	"encoding/json"
-	"net/url"
+
+	"github.com/zawa-t/pr-commentator/src/platform/http/url"
 )
 
 // Request ...
 type Request struct {
 	method method
-	url    *URL
+	url    *url.URL
 	body   *bytes.Buffer
 	header header
 
@@ -17,7 +18,7 @@ type Request struct {
 }
 
 // NewRequest ...
-func NewRequest(method method, url *URL, body any) (*Request, error) {
+func NewRequest(method method, url *url.URL, body any) (*Request, error) {
 	b, err := newRequestBody(body)
 	if err != nil {
 		return nil, err
@@ -61,23 +62,4 @@ func newRequestBody(body any) (*bytes.Buffer, error) {
 		return nil, err
 	}
 	return bytes.NewBuffer(b), nil
-}
-
-// URL ...
-type URL struct {
-	netURL *url.URL
-}
-
-// NewURL ...
-func NewURL(rawURL string) (*URL, error) {
-	v, err := url.Parse(rawURL)
-	if err != nil {
-		return nil, err
-	}
-	return &URL{v}, nil
-}
-
-// String ...
-func (u *URL) String() string {
-	return u.netURL.String()
 }

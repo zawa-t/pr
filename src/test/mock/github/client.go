@@ -22,6 +22,9 @@ var _ github.Client = &ClientMock{}
 //			CreateCommentFunc: func(ctx context.Context, data github.CommentData) error {
 //				panic("mock out the CreateComment method")
 //			},
+//			CreateReviewFunc: func(ctx context.Context, data github.ReviewData) error {
+//				panic("mock out the CreateReview method")
+//			},
 //		}
 //
 //		// use mockedClient in code that requires github.Client
@@ -32,6 +35,9 @@ type ClientMock struct {
 	// CreateCommentFunc mocks the CreateComment method.
 	CreateCommentFunc func(ctx context.Context, data github.CommentData) error
 
+	// CreateReviewFunc mocks the CreateReview method.
+	CreateReviewFunc func(ctx context.Context, data github.ReviewData) error
+
 	// calls tracks calls to the methods.
 	calls struct {
 		// CreateComment holds details about calls to the CreateComment method.
@@ -41,8 +47,16 @@ type ClientMock struct {
 			// Data is the data argument value.
 			Data github.CommentData
 		}
+		// CreateReview holds details about calls to the CreateReview method.
+		CreateReview []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Data is the data argument value.
+			Data github.ReviewData
+		}
 	}
 	lockCreateComment sync.RWMutex
+	lockCreateReview  sync.RWMutex
 }
 
 // CreateComment calls CreateCommentFunc.
@@ -78,5 +92,41 @@ func (mock *ClientMock) CreateCommentCalls() []struct {
 	mock.lockCreateComment.RLock()
 	calls = mock.calls.CreateComment
 	mock.lockCreateComment.RUnlock()
+	return calls
+}
+
+// CreateReview calls CreateReviewFunc.
+func (mock *ClientMock) CreateReview(ctx context.Context, data github.ReviewData) error {
+	if mock.CreateReviewFunc == nil {
+		panic("ClientMock.CreateReviewFunc: method is nil but Client.CreateReview was just called")
+	}
+	callInfo := struct {
+		Ctx  context.Context
+		Data github.ReviewData
+	}{
+		Ctx:  ctx,
+		Data: data,
+	}
+	mock.lockCreateReview.Lock()
+	mock.calls.CreateReview = append(mock.calls.CreateReview, callInfo)
+	mock.lockCreateReview.Unlock()
+	return mock.CreateReviewFunc(ctx, data)
+}
+
+// CreateReviewCalls gets all the calls that were made to CreateReview.
+// Check the length with:
+//
+//	len(mockedClient.CreateReviewCalls())
+func (mock *ClientMock) CreateReviewCalls() []struct {
+	Ctx  context.Context
+	Data github.ReviewData
+} {
+	var calls []struct {
+		Ctx  context.Context
+		Data github.ReviewData
+	}
+	mock.lockCreateReview.RLock()
+	calls = mock.calls.CreateReview
+	mock.lockCreateReview.RUnlock()
 	return calls
 }
