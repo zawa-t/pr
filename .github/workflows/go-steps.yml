@@ -9,14 +9,13 @@ jobs:
   go-steps:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
+    # defaults:
+    #   run:
+    #     working-directory: ./app # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - working-directory: ./
         run: echo "The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Go
