@@ -16,7 +16,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - working-directory: ./
+        run: echo "The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Go
         uses: actions/setup-go@v5
