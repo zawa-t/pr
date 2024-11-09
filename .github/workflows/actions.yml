@@ -22,6 +22,6 @@ jobs:
           echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
   execution:
-    uses: ./.github/workflows/go-steps.yml 
+    uses: ./.github/workflows/go-steps.yml
     secrets:
       REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}

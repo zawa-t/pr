@@ -9,9 +9,9 @@ jobs:
   go-steps:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: /commentator # appディレクトリをデフォルトの作業ディレクトリに設定
+    # defaults:
+    #   run:
+    #     working-directory: /commentator # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
       - name: Check out repository code
@@ -38,10 +38,10 @@ jobs:
 
       - name: Build Test
         # if: ${{ github.event_name == 'push' }}
-        # working-directory: /app
+        working-directory: /commentator
         run: go build -v ./...
 
       - name: Unit Test
         # if: ${{ github.event_name == 'push' }}
-        # working-directory: /app
+        working-directory: /commentator
         run: go test -v ./...
