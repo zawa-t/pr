@@ -6,13 +6,22 @@ import (
 )
 
 var (
-	BitbucketWorkspace      = getEnv("WORKSPACE")
-	BitbucketPRID           = getBitbucketPRID("BITBUCKET_PR_ID")
-	BitbucketRepositoryName = getEnv("REPOSITORY_NAME")
-	BitbucketUserName       = getEnv("BITBUCKET_USERNAME")
-	BitbucketAppPassword    = getEnv("BITBUCKET_APP_PASSWORD")
-	BitbucketCommit         = getEnv("BITBUCKET_COMMIT")
+	BitbucketWorkspace      string
+	BitbucketPRID           int
+	BitbucketRepositoryName string
+	BitbucketUserName       string
+	BitbucketAppPassword    string
+	BitbucketCommit         string
 )
+
+func InitBitbucket() {
+	BitbucketWorkspace = getEnv("WORKSPACE")
+	BitbucketPRID = getBitbucketPRID("BITBUCKET_PR_ID")
+	BitbucketRepositoryName = getEnv("REPOSITORY_NAME")
+	BitbucketUserName = getEnv("BITBUCKET_USERNAME")
+	BitbucketAppPassword = getEnv("BITBUCKET_APP_PASSWORD")
+	BitbucketCommit = getEnv("BITBUCKET_COMMIT")
+}
 
 func getBitbucketPRID(key string) int {
 	prIDstr := getEnv(key)

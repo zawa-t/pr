@@ -8,10 +8,16 @@ import (
 )
 
 var (
-	GithubRepository                        = getEnv("GITHUB_REPOSITORY")
-	GithubPullRequestNumber, GithubCommitID = getGithubPRNumber()
-	GithubAPIToken                          = getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN")
+	GithubRepository                        string
+	GithubPullRequestNumber, GithubCommitID string
+	GithubAPIToken                          string
 )
+
+func InitGithub() {
+	GithubRepository = getEnv("GITHUB_REPOSITORY")
+	GithubPullRequestNumber, GithubCommitID = getGithubPRNumber()
+	GithubAPIToken = getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN")
+}
 
 type Head struct {
 	SHA string `json:"sha"`

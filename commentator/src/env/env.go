@@ -23,5 +23,5 @@ func (e env) IsLocal() bool {
 }
 
 var (
-	Env env = env(getEnv("ENV"))
+	Env env = env(os.Getenv("ENV"))
 )

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/flag"
 	"github.com/zawa-t/pr/commentator/src/format"
 	"github.com/zawa-t/pr/commentator/src/format/json"
@@ -82,8 +83,10 @@ func newPullRequest(platformName string) (pr *platform.PullRequest) {
 	case platform.Local:
 		pr = platform.NewPullRequest(local.NewReview())
 	case platform.Github:
+		env.InitGithub()
 		pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
 	case platform.Bitbucket:
+		env.InitBitbucket()
 		pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
 	default:
 		slog.Error("Unsupported platform was set.")
