@@ -18,7 +18,6 @@ type Required struct {
 
 type Optional struct {
 	CustomTextFormat, AlternativeText, ErrorFormat *string
-	Local                                          bool
 }
 
 type Value struct {
@@ -56,9 +55,6 @@ func NewValue() (value *Value) {
 		flag.StringVar(&alternativeText, f, "", "The flag is optional.")
 	}
 
-	var local bool
-	flag.BoolVar(&local, "local", false, "The flag is optional.")
-
 	var errorFormat string
 	flag.StringVar(&errorFormat, "efm", "", "Error format pattern. %f:%l:%c: %m")
 
@@ -87,8 +83,6 @@ func NewValue() (value *Value) {
 	if errorFormat != "" {
 		value.ErrorFormat = &errorFormat
 	}
-
-	value.Local = local
 
 	value.validate()
 	return
@@ -119,7 +113,7 @@ func (v *Value) validate() {
 		}
 	}
 
-	allowedPlatforms := []string{platform.Bitbucket, platform.Github}
+	allowedPlatforms := []string{platform.Bitbucket, platform.Github, platform.Local}
 	if !slices.Contains(allowedPlatforms, v.PlatformName) {
 		slog.Error("The specified platform is not supported.", "platform", v.PlatformName)
 		os.Exit(1)

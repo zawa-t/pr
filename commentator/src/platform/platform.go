@@ -40,6 +40,7 @@ type Content struct {
 var ErrNotFound = errors.New("not found")
 
 const (
-	Bitbucket = "bitbucket"
+	Local     = "local"
 	Github    = "github"
+	Bitbucket = "bitbucket"
 )

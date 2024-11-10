@@ -38,7 +38,6 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 			Line:      data.LineNum + 1, // TODO: これで本当に良いか検討
 		}
 	}
-	log.PrintJSON("[]CommentData", comments)
 
 	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
 	for _, comment := range comments {

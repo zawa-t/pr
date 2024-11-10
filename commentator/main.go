@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/env"
 	"github.com/zawa-t/pr-reviewer/commentator/src/flag"
 	"github.com/zawa-t/pr-reviewer/commentator/src/format"
 	"github.com/zawa-t/pr-reviewer/commentator/src/format/json"
@@ -16,7 +15,7 @@ import (
 	"github.com/zawa-t/pr-reviewer/commentator/src/platform/github"
 	githubClient "github.com/zawa-t/pr-reviewer/commentator/src/platform/github/client"
 	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http"
-	"github.com/zawa-t/pr-reviewer/commentator/src/test/custommock"
+	"github.com/zawa-t/pr-reviewer/commentator/src/platform/local"
 )
 
 /*
@@ -79,21 +78,33 @@ func newData(flagValue flag.Value, stdin *os.File) platform.Data {
 
 func newPullRequest(platformName string) (pr *platform.PullRequest) {
 	switch platformName {
-	case platform.Bitbucket:
-		if env.Env.IsLocal() {
-			pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))
-		} else {
-			pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
-		}
+	case platform.Local:
+		pr = platform.NewPullRequest(local.NewReview())
 	case platform.Github:
-		if env.Env.IsLocal() {
-			pr = platform.NewPullRequest(github.NewReview(custommock.DefaultGithubReview))
-		} else {
-			pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
-		}
+		pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
+	case platform.Bitbucket:
+		pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
 	default:
 		slog.Error("Unsupported platform was set.")
 		os.Exit(1)
 	}
+
+	// switch platformName {
+	// case platform.Bitbucket:
+	// 	if env.Env.IsLocal() {
+	// 		pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))
+	// 	} else {
+	// 		pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
+	// 	}
+	// case platform.Github:
+	// 	if env.Env.IsLocal() {
+	// 		pr = platform.NewPullRequest(github.NewReview(custommock.DefaultGithubReview))
+	// 	} else {
+	// 		pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
+	// 	}
+	// default:
+	// 	slog.Error("Unsupported platform was set.")
+	// 	os.Exit(1)
+	// }
 	return
 }
