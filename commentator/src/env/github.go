@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 var (
@@ -14,7 +15,7 @@ var (
 )
 
 type PullRequest struct {
-	Number string `json:"number"`
+	Number int `json:"number"`
 }
 
 type Event struct {
@@ -37,7 +38,7 @@ func getGithubPRNumber() string {
 			return ""
 		}
 
-		fmt.Printf("Pull Request Number: %s\n", event.PullRequest.Number)
-		return event.PullRequest.Number
+		fmt.Printf("Pull Request Number: %d\n", event.PullRequest.Number)
+		return strconv.Itoa(event.PullRequest.Number)
 	}
 }
