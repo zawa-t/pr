@@ -108,3 +108,7 @@ func newPullRequest(platformName string) (pr *platform.PullRequest) {
 	// }
 	return
 }
+
+func a() {
+
+}
