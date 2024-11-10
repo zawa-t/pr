@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/flag"
 	"github.com/zawa-t/pr/commentator/src/format"
 	"github.com/zawa-t/pr/commentator/src/format/json"
@@ -42,6 +43,8 @@ func main() {
 		slog.Error("Stdin could not be verified.", "error", err.Error())
 		os.Exit(1)
 	}
+
+	slog.Warn("test", "owner", env.Owner)
 	// MEMO:
 	// stat.Mode()を実行することでファイルのモード情報（ファイルの種類やアクセス権）を取得。それによって設定される os.ModeCharDevice の値を用いて、
 	// 入力がキャラクタデバイス（通常、ターミナル）であるか否かを確認。現時点では、標準入力がパイプやリダイレクトのみ受け付けたいため、ターミナルからの入力の場合（0 でない場合）は処理終了。

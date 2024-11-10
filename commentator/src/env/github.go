@@ -1,6 +1,7 @@
 package env
 
 var (
+	Owner                   = "${{ github.repository }}"
 	GithubRepositoryOwner   = getEnv("GITHUB_OWNER")
 	GithubRepository        = getEnv("GITHUB_REPO")
 	GithubPullRequestNumber = getEnv("GITHUB_PR_NUMBER")
