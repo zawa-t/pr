@@ -31,11 +31,13 @@ func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
 		}
 		comments[i] = CommentData{
-			Body:      text,
-			CommitID:  env.GithubCommitID,
-			Path:      data.FilePath,
-			StartLine: data.LineNum,
-			Line:      data.LineNum + 1, // TODO: これで本当に良いか検討
+			Body:        text,
+			CommitID:    env.GithubCommitID,
+			Path:        data.FilePath,
+			StartLine:   data.LineNum,
+			Line:        data.LineNum + 1, // TODO: これで本当に良いか検討
+			Position:    5,
+			SubjectType: "line",
 		}
 	}
 
