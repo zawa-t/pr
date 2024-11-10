@@ -47,7 +47,7 @@ func (c *Custom) CreateComment(ctx context.Context, data github.CommentData) err
 	}
 
 	if res.StatusCode != 201 {
-		slog.Error("Failed to post comment.", "req", data, "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
+		slog.Error("Failed to post comment.", "req", fmt.Sprintf("URL: %s, Request body: %+v", parsedURL.String(), data), "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
 		return fmt.Errorf("failed to post comment")
 	}
 
@@ -79,7 +79,7 @@ func (c *Custom) CreateReview(ctx context.Context, data github.ReviewData) error
 	}
 
 	if res.StatusCode != 201 {
-		slog.Error("Failed to post comment.", "req", data, "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
+		slog.Error("Failed to post comment.", "req", fmt.Sprintf("URL: %s, Request body: %+v", parsedURL.String(), data), "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
 		return fmt.Errorf("failed to post comment")
 	}
 
@@ -111,7 +111,7 @@ func (c *Custom) CreateCheckRun(ctx context.Context, data github.CheckRunsOutput
 	}
 
 	if res.StatusCode != 201 {
-		slog.Error("Failed to post comment.", "req", data, "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
+		slog.Error("Failed to create check run.", "req", fmt.Sprintf("URL: %s, Request body: %+v", parsedURL.String(), data), "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
 		return fmt.Errorf("failed to post comment")
 	}
 
