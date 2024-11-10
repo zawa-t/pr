@@ -88,24 +88,6 @@ func newPullRequest(platformName string) (pr *platform.PullRequest) {
 		slog.Error("Unsupported platform was set.")
 		os.Exit(1)
 	}
-
-	// switch platformName {
-	// case platform.Bitbucket:
-	// 	if env.Env.IsLocal() {
-	// 		pr = platform.NewPullRequest(bitbucket.NewReview(custommock.DefaultBitbucketReview))
-	// 	} else {
-	// 		pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
-	// 	}
-	// case platform.Github:
-	// 	if env.Env.IsLocal() {
-	// 		pr = platform.NewPullRequest(github.NewReview(custommock.DefaultGithubReview))
-	// 	} else {
-	// 		pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
-	// 	}
-	// default:
-	// 	slog.Error("Unsupported platform was set.")
-	// 	os.Exit(1)
-	// }
 	return
 }
 
