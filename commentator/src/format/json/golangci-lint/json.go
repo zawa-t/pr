@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
 type JSON struct {

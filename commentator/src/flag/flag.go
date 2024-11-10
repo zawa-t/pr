@@ -6,8 +6,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/format"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/format"
+	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
 var usage = "Usage: pr-commentator --name=[tool name] --input-format=[input format] --platform=[platform name] < inputfile"

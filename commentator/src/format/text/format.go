@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/flag"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/flag"
+	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
 type ErrorFormat struct {

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/env"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/github"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http/url"
+	"github.com/zawa-t/pr/commentator/src/env"
+	"github.com/zawa-t/pr/commentator/src/platform/github"
+	"github.com/zawa-t/pr/commentator/src/platform/http"
+	"github.com/zawa-t/pr/commentator/src/platform/http/url"
 )
 
 // Custom provides client for HTTP request.

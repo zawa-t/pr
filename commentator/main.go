@@ -5,17 +5,17 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/flag"
-	"github.com/zawa-t/pr-reviewer/commentator/src/format"
-	"github.com/zawa-t/pr-reviewer/commentator/src/format/json"
-	"github.com/zawa-t/pr-reviewer/commentator/src/format/text"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/bitbucket"
-	bitbucketClient "github.com/zawa-t/pr-reviewer/commentator/src/platform/bitbucket/client"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/github"
-	githubClient "github.com/zawa-t/pr-reviewer/commentator/src/platform/github/client"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/local"
+	"github.com/zawa-t/pr/commentator/src/flag"
+	"github.com/zawa-t/pr/commentator/src/format"
+	"github.com/zawa-t/pr/commentator/src/format/json"
+	"github.com/zawa-t/pr/commentator/src/format/text"
+	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
+	bitbucketClient "github.com/zawa-t/pr/commentator/src/platform/bitbucket/client"
+	"github.com/zawa-t/pr/commentator/src/platform/github"
+	githubClient "github.com/zawa-t/pr/commentator/src/platform/github/client"
+	"github.com/zawa-t/pr/commentator/src/platform/http"
+	"github.com/zawa-t/pr/commentator/src/platform/local"
 )
 
 /*

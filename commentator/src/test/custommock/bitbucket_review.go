@@ -3,9 +3,9 @@ package custommock
 import (
 	"context"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/bitbucket"
-	mock "github.com/zawa-t/pr-reviewer/commentator/src/test/mock/bitbucket"
+	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
+	mock "github.com/zawa-t/pr/commentator/src/test/mock/bitbucket"
 )
 
 var DefaultBitbucketReview = &mock.ClientMock{

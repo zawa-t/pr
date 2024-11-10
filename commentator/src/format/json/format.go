@@ -3,10 +3,10 @@ package json
 import (
 	"os"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/flag"
-	golangcilint "github.com/zawa-t/pr-reviewer/commentator/src/format/json/golangci-lint"
+	"github.com/zawa-t/pr/commentator/src/flag"
+	golangcilint "github.com/zawa-t/pr/commentator/src/format/json/golangci-lint"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
 func Decode(flagValue flag.Value, stdin *os.File) (contents []platform.Content) {

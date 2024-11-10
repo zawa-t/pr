@@ -3,8 +3,8 @@ package client
 import (
 	"fmt"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/env"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform/http/url"
+	"github.com/zawa-t/pr/commentator/src/env"
+	"github.com/zawa-t/pr/commentator/src/platform/http/url"
 )
 
 var baseURL = fmt.Sprintf("https://api.bitbucket.org/2.0/repositories/%s/%s", env.BitbucketWorkspace, env.BitbucketRepositoryName)

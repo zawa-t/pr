@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zawa-t/pr-reviewer/commentator/src/log"
-	"github.com/zawa-t/pr-reviewer/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/log"
+	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
 // Review ...
