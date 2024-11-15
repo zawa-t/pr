@@ -13,114 +13,111 @@ import (
 	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
-type ErrorFormat struct {
-	File, Line, Column, Message bool
+// errorformat 文字列から正規表現を生成する関数
+func convertErrorFormatToRegex(efm string) (*regexp.Regexp, error) {
+	efmPatterns := map[string]string{
+		"%f": `(?P<File>(?:\./)?[a-zA-Z0-9_\-/]+(?:\.[a-zA-Z0-9]+)?)`, // ファイルパス形式の文字列にマッチ ex)「main.go」「./src/main.go」「src/dir/file.py」
+		"%l": `(?P<Line>\d+)`,                                         // 数字にマッチ
+		"%c": `(?P<Column>\d+)`,                                       // 数字にマッチ
+		"%m": `(?P<Message>.+)`,                                       // 任意の文字列にマッチ
+	}
+
+	regexPattern := efm
+	for placeholder, regexPart := range efmPatterns {
+		regexPattern = strings.ReplaceAll(regexPattern, placeholder, regexPart)
+	}
+
+	return regexp.Compile("^" + regexPattern + "$")
 }
 
+// efm パターンでファイルをパースして Issue を抽出する関数
 func Read(flagValue flag.Value, stdin *os.File) []platform.Content {
+	if flagValue.ErrorFormat == nil {
+		slog.Error("errorformatの指定がありません")
+		os.Exit(1)
+	}
+
+	efm := *flagValue.ErrorFormat
+	regex, err := convertErrorFormatToRegex(efm)
+	if err != nil {
+		slog.Error("errorformat を正規表現に変換できません", "error", err.Error())
+		os.Exit(1)
+	}
+
 	contents := make([]platform.Content, 0)
+	var currentContent *platform.Content
 
 	scanner := bufio.NewScanner(stdin)
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
-	}
 
-	efm := *flagValue.ErrorFormat // ex) For example, line is "%f:%l:%c: %m"
-
-	errorFormat := new(ErrorFormat)
-	for _, v := range strings.Split(efm, ":") {
-		switch strings.TrimSpace(v) {
-		case "%f":
-			errorFormat.File = true
-		case "%l":
-			errorFormat.Line = true
-		case "%c":
-			errorFormat.Column = true
-		case "%m":
-			errorFormat.Message = true
-		default:
-			slog.Error("The specified errorformat name is undefined.")
-			os.Exit(1)
-		}
-	}
-
+	lineCounter := 0
 	for scanner.Scan() {
 		line := scanner.Text()
+		fmt.Println(line)
 
-		efm = strings.ReplaceAll(efm, "%f", `(?P<file>[^:]+)`)
-		efm = strings.ReplaceAll(efm, "%l", `(?P<line>\d+)`)
-		efm = strings.ReplaceAll(efm, "%c", `(?P<column>\d+)`)
-		efm = strings.ReplaceAll(efm, "%m", `(?P<message>.+)`)
-
-		re := regexp.MustCompile(efm)
-		match := re.FindStringSubmatch(line)
-		if match == nil {
-			slog.Error(fmt.Sprintf("Failed to parse line: %s", line))
-			os.Exit(1)
-		}
-
-		result := make(map[string]string)
-		for i, name := range re.SubexpNames() {
-			if i > 0 && name != "" {
-				result[name] = match[i]
+		// 正規表現によるエラーメッセージ行の解析
+		if matches := regex.FindStringSubmatch(line); len(matches) > 0 {
+			// エラーメッセージ行の場合、新しい Issue を初期化
+			if currentContent != nil {
+				contents = append(contents, *currentContent)
 			}
-		}
+			currentContent = &platform.Content{}
+			lineCounter = 1
 
-		if errorFormat.File && result["file"] == "" {
-			slog.Error("A file name was specified in errorformat, but no value was found.", "text", line)
-			os.Exit(1)
-		}
-
-		if errorFormat.Line && result["line"] == "" {
-			slog.Error("A line number was specified in errorformat, but no value was found.", "text", line)
-			os.Exit(1)
-		}
-
-		if errorFormat.Column && result["column"] == "" {
-			slog.Error("A column number was specified in errorformat, but no value was found.", "text", line)
-			os.Exit(1)
-		}
-
-		if errorFormat.Message && result["message"] == "" {
-			slog.Error("A message was specified in errorformat, but no value was found.", "text", line)
-			os.Exit(1)
-		}
-
-		var lineNum int
-		var err error
-		if result["line"] != "" {
-			lineNum, err = strconv.Atoi(result["line"])
-			if err != nil {
-				slog.Error("Faild to strconv.Atoi().")
-				os.Exit(1)
+			// キャプチャグループから Issue を生成
+			for i, name := range regex.SubexpNames() {
+				if i == 0 || name == "" {
+					continue
+				}
+				value := matches[i]
+				switch name {
+				case "File":
+					currentContent.FilePath = value
+				case "Line":
+					currentContent.LineNum = toUint(value)
+				case "Column":
+					currentContent.ColumnNum = toUint(value)
+				case "Message":
+					currentContent.Message = value
+				}
 			}
-		}
+			currentContent.Linter = flagValue.Name
+		} else if currentContent != nil && lineCounter == 1 {
+			// 2行目：該当コード行
+			currentContent.CodeLine = line
+			lineCounter++
+		} else if currentContent != nil && lineCounter == 2 {
+			// 3行目：インジケータ行
+			currentContent.Indicator = line
+			contents = append(contents, *currentContent)
 
-		var columnNum int
-		if result["column"] != "" {
-			columnNum, err = strconv.Atoi(result["column"])
-			if err != nil {
-				slog.Error("Faild to strconv.Atoi().")
-				os.Exit(1)
-			}
+			// 初期化
+			currentContent = nil
+			lineCounter = 0
 		}
-
-		var message string
-		if result["message"] != "" {
-			if flagValue.AlternativeText == nil {
-				message = strings.TrimSpace(result["message"])
-			} else {
-				message = *flagValue.AlternativeText
-			}
-		}
-
-		contents = append(contents, platform.Content{
-			Linter:    flagValue.Name,
-			FilePath:  result["file"],
-			LineNum:   uint(lineNum),
-			ColumnNum: uint(columnNum),
-			Message:   message,
-		})
 	}
+
+	if currentContent != nil {
+		contents = append(contents, *currentContent)
+	}
+
+	if err := scanner.Err(); err != nil {
+		slog.Error("読み込みエラー", "error", err.Error())
+		os.Exit(1)
+	}
+
+	if len(contents) == 0 {
+		slog.Info("No data matching errorformat was found.")
+	}
+
 	return contents
+}
+
+// 文字列を整数に変換するためのヘルパー関数
+func toUint(s string) uint {
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		slog.Error("failed to exec strconv.Atoi()", "error", err.Error())
+		os.Exit(1)
+	}
+	return uint(num)
 }

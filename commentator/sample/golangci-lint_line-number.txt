@@ -1,0 +1,6 @@
+main.go:9:6: func `a` is unused (unused)
+func a() {
+     ^
+main.go:13:6: func `b` is unused (unused)
+func b() {
+     ^

@@ -22,17 +22,24 @@ import (
 以下、動作確認用コマンド
 ```
 $ go build -o pr-commentator
+
+<json>
 $ ./pr-commentator -n=golangci-lint -f=json --platform=bitbucket < sample/sample.json
+
+<text>
+$ ./pr-commentator -n=golangci-lint -f=text -efm="%f:%l:%c: %m" --platform=local < sample/golangci-lint_line-number.txt
 ```
 */
 
 /*
 TODO:
+・golangci-lintのline-numberも利用できるようにする
 ・githubにanotationコメントを入れられるようにする
 ・githubも同じコメントは1回しか入らないようにする
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）
 ・httpパッケージまわりの整備
 ・BitbucketのGetComment()の並行処理化
+・環境変数不足時のログが必要な分しかwarnが出ないように変更（githubのときはgithubで必要な環境変数だけ）
 */
 
 func main() {
@@ -52,12 +59,18 @@ func main() {
 	}
 
 	flagValue := flag.NewValue()
-	if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), newData(*flagValue, stdin)); err != nil {
-		slog.Error("Failed to add comments.", "error", err.Error())
-		os.Exit(1)
-	}
+	data := newData(*flagValue, stdin)
 
-	slog.Info("The pull request comments were successfully added.")
+	if len(data.Contents) == 0 {
+		slog.Info("No comments were added. This is because there is no data to comment on.")
+	} else {
+		if err := newPullRequest(flagValue.PlatformName).AddComments(context.Background(), data); err != nil {
+			slog.Error("Failed to add comments.", "error", err.Error())
+			os.Exit(1)
+		}
+
+		slog.Info("The pull request comments were successfully added.")
+	}
 }
 
 func newData(flagValue flag.Value, stdin *os.File) platform.Data {

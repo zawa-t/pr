@@ -29,11 +29,14 @@ type Data struct {
 
 // Content ...
 type Content struct {
-	Linter            string
-	FilePath          string
-	LineNum           uint
-	ColumnNum         uint
-	Message           string
+	Linter    string
+	FilePath  string
+	LineNum   uint
+	ColumnNum uint
+	CodeLine  string
+	Indicator string
+	Message   string
+
 	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
 }
 
