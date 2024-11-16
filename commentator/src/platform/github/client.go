@@ -7,6 +7,7 @@ import "context"
 type Client interface {
 	CreateComment(ctx context.Context, data CommentData) error
 	CreateReview(ctx context.Context, data ReviewData) error
+	CreateCheckRun(ctx context.Context, data POSTCheckRuns) error
 }
 
 // --------------------

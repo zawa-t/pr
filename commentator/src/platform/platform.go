@@ -43,7 +43,7 @@ type Content struct {
 var ErrNotFound = errors.New("not found")
 
 const (
-	Local     = "local"
-	Github    = "github"
-	Bitbucket = "bitbucket"
+	LocalReviewer     = "local-reviewer"
+	GithubReviewer    = "github-reviewer"
+	BitbucketReviewer = "bitbucket-reviewer"
 )

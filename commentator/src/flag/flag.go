@@ -10,10 +10,10 @@ import (
 	"github.com/zawa-t/pr/commentator/src/platform"
 )
 
-var usage = "Usage: pr-commentator --name=[tool name] --input-format=[input format] --platform=[platform name] < inputfile"
+var usage = "Usage: commentator --name=[tool name] --input-format=[input format] --reviewer=[reviewer name] < inputfile"
 
 type Required struct {
-	Name, InputFormat, PlatformName string
+	Name, InputFormat, Reviewer string
 }
 
 type Optional struct {
@@ -39,8 +39,11 @@ func NewValue() (value *Value) {
 		flag.StringVar(&inputFormat, f, "text", "input format. The flag is required. json, text")
 	}
 
-	var platform string
-	flag.StringVar(&platform, "platform", "", "The flag is required.")
+	var reviewer string
+	reviewerFlags := []string{"r", "reviewer"}
+	for _, f := range reviewerFlags {
+		flag.StringVar(&reviewer, f, "", "The flag is required.")
+	}
 
 	// Optional
 	var customTextFormat string
@@ -68,9 +71,9 @@ func NewValue() (value *Value) {
 
 	value = &Value{
 		Required: Required{
-			Name:         name,
-			InputFormat:  inputFormat,
-			PlatformName: platform,
+			Name:        name,
+			InputFormat: inputFormat,
+			Reviewer:    reviewer,
 		},
 	}
 
@@ -99,7 +102,7 @@ func NewValue() (value *Value) {
 }
 
 func (v *Value) validate() {
-	if v.Name == "" || v.InputFormat == "" || v.PlatformName == "" {
+	if v.Name == "" || v.InputFormat == "" || v.Reviewer == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
@@ -128,9 +131,9 @@ func (v *Value) validate() {
 		}
 	}
 
-	allowedPlatforms := []string{platform.Bitbucket, platform.Github, platform.Local}
-	if !slices.Contains(allowedPlatforms, v.PlatformName) {
-		slog.Error("The specified platform is not supported.", "platform", v.PlatformName)
+	allowedReviewers := []string{platform.BitbucketReviewer, platform.GithubReviewer, platform.LocalReviewer}
+	if !slices.Contains(allowedReviewers, v.Reviewer) {
+		slog.Error("The specified reviewer is not supported.", "reviewer", v.Reviewer)
 		os.Exit(1)
 	}
 }

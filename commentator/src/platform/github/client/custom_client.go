@@ -87,7 +87,7 @@ func (c *Custom) CreateReview(ctx context.Context, data github.ReviewData) error
 }
 
 // CreateCheckRun ...
-func (c *Custom) CreateCheckRun(ctx context.Context, data github.CheckRunsOutput) error {
+func (c *Custom) CreateCheckRun(ctx context.Context, data github.POSTCheckRuns) error {
 	parsedURL, err := url.New(checkRunURL)
 	if err != nil {
 		return fmt.Errorf("failed to exec url.New(): %w", err)

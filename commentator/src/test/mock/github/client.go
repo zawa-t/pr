@@ -19,6 +19,9 @@ var _ github.Client = &ClientMock{}
 //
 //		// make and configure a mocked github.Client
 //		mockedClient := &ClientMock{
+//			CreateCheckRunFunc: func(ctx context.Context, data github.POSTCheckRuns) error {
+//				panic("mock out the CreateCheckRun method")
+//			},
 //			CreateCommentFunc: func(ctx context.Context, data github.CommentData) error {
 //				panic("mock out the CreateComment method")
 //			},
@@ -32,6 +35,9 @@ var _ github.Client = &ClientMock{}
 //
 //	}
 type ClientMock struct {
+	// CreateCheckRunFunc mocks the CreateCheckRun method.
+	CreateCheckRunFunc func(ctx context.Context, data github.POSTCheckRuns) error
+
 	// CreateCommentFunc mocks the CreateComment method.
 	CreateCommentFunc func(ctx context.Context, data github.CommentData) error
 
@@ -40,6 +46,13 @@ type ClientMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// CreateCheckRun holds details about calls to the CreateCheckRun method.
+		CreateCheckRun []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Data is the data argument value.
+			Data github.POSTCheckRuns
+		}
 		// CreateComment holds details about calls to the CreateComment method.
 		CreateComment []struct {
 			// Ctx is the ctx argument value.
@@ -55,8 +68,45 @@ type ClientMock struct {
 			Data github.ReviewData
 		}
 	}
-	lockCreateComment sync.RWMutex
-	lockCreateReview  sync.RWMutex
+	lockCreateCheckRun sync.RWMutex
+	lockCreateComment  sync.RWMutex
+	lockCreateReview   sync.RWMutex
+}
+
+// CreateCheckRun calls CreateCheckRunFunc.
+func (mock *ClientMock) CreateCheckRun(ctx context.Context, data github.POSTCheckRuns) error {
+	if mock.CreateCheckRunFunc == nil {
+		panic("ClientMock.CreateCheckRunFunc: method is nil but Client.CreateCheckRun was just called")
+	}
+	callInfo := struct {
+		Ctx  context.Context
+		Data github.POSTCheckRuns
+	}{
+		Ctx:  ctx,
+		Data: data,
+	}
+	mock.lockCreateCheckRun.Lock()
+	mock.calls.CreateCheckRun = append(mock.calls.CreateCheckRun, callInfo)
+	mock.lockCreateCheckRun.Unlock()
+	return mock.CreateCheckRunFunc(ctx, data)
+}
+
+// CreateCheckRunCalls gets all the calls that were made to CreateCheckRun.
+// Check the length with:
+//
+//	len(mockedClient.CreateCheckRunCalls())
+func (mock *ClientMock) CreateCheckRunCalls() []struct {
+	Ctx  context.Context
+	Data github.POSTCheckRuns
+} {
+	var calls []struct {
+		Ctx  context.Context
+		Data github.POSTCheckRuns
+	}
+	mock.lockCreateCheckRun.RLock()
+	calls = mock.calls.CreateCheckRun
+	mock.lockCreateCheckRun.RUnlock()
+	return calls
 }
 
 // CreateComment calls CreateCommentFunc.
