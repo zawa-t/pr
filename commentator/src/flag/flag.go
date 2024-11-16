@@ -17,7 +17,7 @@ type Required struct {
 }
 
 type Optional struct {
-	CustomTextFormat, AlternativeText, ErrorFormat *string
+	CustomTextFormat, AlternativeText, ErrorFormat, FormatType *string
 }
 
 type Value struct {
@@ -36,17 +36,17 @@ func NewValue() (value *Value) {
 	var inputFormat string
 	inputFormatFlags := []string{"f", "input-format"}
 	for _, f := range inputFormatFlags {
-		flag.StringVar(&inputFormat, f, "", "input format. The flag is required. json, text")
+		flag.StringVar(&inputFormat, f, "text", "input format. The flag is required. json, text")
 	}
 
 	var platform string
-	flag.StringVar(&platform, "platform", "", "The flag is optional.")
+	flag.StringVar(&platform, "platform", "", "The flag is required.")
 
 	// Optional
 	var customTextFormat string
 	customTextFormatFlags := []string{"cus", "custom-text-format"}
 	for _, f := range customTextFormatFlags {
-		flag.StringVar(&customTextFormat, f, "", "The flag is optional.")
+		flag.StringVar(&customTextFormat, f, "", "The flag is optional. input-format が json の場合にのみ使用可能")
 	}
 
 	var alternativeText string
@@ -55,8 +55,14 @@ func NewValue() (value *Value) {
 		flag.StringVar(&alternativeText, f, "", "The flag is optional.")
 	}
 
+	var formatType string
+	formatTypeFlags := []string{"t", "format-type"}
+	for _, f := range formatTypeFlags {
+		flag.StringVar(&formatType, f, "", "format type. The flag is optional. input-format が json の場合は必須。 golangci-lint")
+	}
+
 	var errorFormat string
-	flag.StringVar(&errorFormat, "efm", "", "Error format pattern. %f:%l:%c: %m")
+	flag.StringVar(&errorFormat, "efm", "", "Error format pattern. input-format が text の場合にのみ使用可能。%f:%l:%c: %m")
 
 	flag.Parse()
 
@@ -84,6 +90,10 @@ func NewValue() (value *Value) {
 		value.ErrorFormat = &errorFormat
 	}
 
+	if formatType != "" {
+		value.FormatType = &formatType
+	}
+
 	value.validate()
 	return
 }
@@ -106,9 +116,14 @@ func (v *Value) validate() {
 	}
 
 	if v.InputFormat == format.JSON {
-		allowedNames := []string{"golangci-lint"}
-		if !slices.Contains(allowedNames, v.Name) {
-			slog.Error("The specified tool cannot use json format data.", "name", v.Name)
+		if v.FormatType == nil {
+			slog.Error("If the input-format flag is json, format-type flag must be specified.")
+			os.Exit(1)
+		}
+
+		allowedFormatTypes := []string{"golangci-lint"}
+		if !slices.Contains(allowedFormatTypes, *v.FormatType) {
+			slog.Error("The specified format-type is not supported.", "name", *v.FormatType)
 			os.Exit(1)
 		}
 	}

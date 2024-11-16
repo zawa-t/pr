@@ -24,16 +24,15 @@ import (
 $ go build -o pr-commentator
 
 <json>
-$ ./pr-commentator -n=golangci-lint -f=json --platform=bitbucket < sample/sample.json
+$ ./pr-commentator -n=golangci-lint -f=json -t=golangci-lint --platform=local < sample/sample.json
 
 <text>
-$ ./pr-commentator -n=golangci-lint -f=text -efm="%f:%l:%c: %m" --platform=local < sample/golangci-lint_line-number.txt
+$ ./pr-commentator -n=golangci-lint -efm="%f:%l:%c: %m" --platform=local < sample/golangci-lint_line-number.txt
 ```
 */
 
 /*
 TODO:
-・golangci-lintのline-numberも利用できるようにする
 ・githubにanotationコメントを入れられるようにする
 ・githubも同じコメントは1回しか入らないようにする
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）

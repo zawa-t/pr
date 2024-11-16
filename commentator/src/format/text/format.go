@@ -106,7 +106,7 @@ func Read(flagValue flag.Value, stdin *os.File) []platform.Content {
 	}
 
 	if len(contents) == 0 {
-		slog.Info("No data matching errorformat was found.")
+		slog.Info("No rows matched the specified errorformat.")
 	}
 
 	return contents
