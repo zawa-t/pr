@@ -88,9 +88,10 @@ func (r *Review) AddReviewComments(ctx context.Context, input platform.Data) err
 // AddComments ...
 func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
 	postheckRuns := POSTCheckRuns{
-		Name:    "xxxx",
-		HeadSHA: env.GithubCommitID,
-		Status:  "completed",
+		Name:       "xxxx",
+		HeadSHA:    env.GithubCommitID,
+		Status:     "completed",
+		Conclusion: "failure",
 		Output: CheckRunsOutput{
 			Title:   input.Name,
 			Summary: "",
