@@ -1,24 +1,24 @@
-package local
+package role
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/zawa-t/pr/commentator/src/log"
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/review"
 )
 
+// localCommentator ...
+type localCommentator struct {
+}
+
+// NewLocalCommentator ...
+func NewLocalCommentator() *localCommentator {
+	return &localCommentator{}
+}
+
 // Review ...
-type Review struct {
-}
-
-// NewReview ...
-func NewReview() *Review {
-	return &Review{}
-}
-
-// AddComments ...
-func (r *Review) AddComments(ctx context.Context, input platform.Data) error {
+func (pr *localCommentator) Review(ctx context.Context, input review.Data) error {
 	for i, content := range input.Contents {
 		var text string
 		if content.CustomCommentText != nil { // HACK: bitbucketと同じ内容のため共通化したい

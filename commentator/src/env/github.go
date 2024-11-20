@@ -7,11 +7,25 @@ import (
 	"strconv"
 )
 
-var (
-	GithubRepository                        = getEnv("GITHUB_REPOSITORY")
-	GithubPullRequestNumber, GithubCommitID = getGithubPRNumber()
-	GithubAPIToken                          = getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN")
-)
+type GithubConfig struct {
+	Repository        string
+	PullRequestNumber string
+	CommitID          string
+	APIToken          string
+}
+
+var Github GithubConfig
+
+func init() {
+	if os.Getenv("GITHUB_ACTIONS") == "true" {
+		Github = GithubConfig{
+			Repository: getEnv("GITHUB_REPOSITORY"),
+			APIToken:   getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN"),
+		}
+
+		Github.PullRequestNumber, Github.CommitID = getGithubPRNumber()
+	}
+}
 
 type Head struct {
 	SHA string `json:"sha"`

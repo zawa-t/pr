@@ -6,10 +6,10 @@ import (
 	"github.com/zawa-t/pr/commentator/src/flag"
 	golangcilint "github.com/zawa-t/pr/commentator/src/format/json/golangci-lint"
 
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/review"
 )
 
-func Decode(flagValue flag.Value, stdin *os.File) (contents []platform.Content) {
+func Decode(flagValue flag.Value, stdin *os.File) (contents []review.Content) {
 	switch flagValue.Name {
 	case "golangci-lint":
 		jsonData := golangcilint.Decode(stdin)

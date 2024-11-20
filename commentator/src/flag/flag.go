@@ -7,13 +7,13 @@ import (
 	"slices"
 
 	"github.com/zawa-t/pr/commentator/src/format"
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/review/role"
 )
 
-var usage = "Usage: commentator --name=[tool name] --input-format=[input format] --reviewer=[reviewer name] < inputfile"
+var usage = "Usage: commentator --name=[tool name] --input-format=[input format] --role=[role name] < inputfile"
 
 type Required struct {
-	Name, InputFormat, Reviewer string
+	Name, InputFormat, Role string
 }
 
 type Optional struct {
@@ -39,10 +39,10 @@ func NewValue() (value *Value) {
 		flag.StringVar(&inputFormat, f, "text", "input format. The flag is required. json, text")
 	}
 
-	var reviewer string
-	reviewerFlags := []string{"r", "reviewer"}
-	for _, f := range reviewerFlags {
-		flag.StringVar(&reviewer, f, "", "The flag is required.")
+	var role string
+	roleFlags := []string{"r", "role"}
+	for _, f := range roleFlags {
+		flag.StringVar(&role, f, "", "The flag is required.")
 	}
 
 	// Optional
@@ -73,7 +73,7 @@ func NewValue() (value *Value) {
 		Required: Required{
 			Name:        name,
 			InputFormat: inputFormat,
-			Reviewer:    reviewer,
+			Role:        role,
 		},
 	}
 
@@ -102,7 +102,7 @@ func NewValue() (value *Value) {
 }
 
 func (v *Value) validate() {
-	if v.Name == "" || v.InputFormat == "" || v.Reviewer == "" {
+	if v.Name == "" || v.InputFormat == "" || v.Role == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
@@ -131,9 +131,9 @@ func (v *Value) validate() {
 		}
 	}
 
-	allowedReviewers := []string{platform.BitbucketReviewer, platform.GithubReviewer, platform.LocalReviewer}
-	if !slices.Contains(allowedReviewers, v.Reviewer) {
-		slog.Error("The specified reviewer is not supported.", "reviewer", v.Reviewer)
+	allowedRoleNames := []string{role.BitbucketPRCommentator, role.GithubPRCommentator, role.LocalCommentator}
+	if !slices.Contains(allowedRoleNames, v.Role) {
+		slog.Error("The specified role is not supported.", "role", v.Role)
 		os.Exit(1)
 	}
 }

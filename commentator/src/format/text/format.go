@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/zawa-t/pr/commentator/src/flag"
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/review"
 )
 
 // errorformat 文字列から正規表現を生成する関数
@@ -31,7 +31,7 @@ func convertErrorFormatToRegex(efm string) (*regexp.Regexp, error) {
 }
 
 // efm パターンでファイルをパースして Issue を抽出する関数
-func Read(flagValue flag.Value, stdin *os.File) []platform.Content {
+func Read(flagValue flag.Value, stdin *os.File) []review.Content {
 	if flagValue.ErrorFormat == nil {
 		slog.Error("errorformatの指定がありません")
 		os.Exit(1)
@@ -44,8 +44,8 @@ func Read(flagValue flag.Value, stdin *os.File) []platform.Content {
 		os.Exit(1)
 	}
 
-	contents := make([]platform.Content, 0)
-	var currentContent *platform.Content
+	contents := make([]review.Content, 0)
+	var currentContent *review.Content
 
 	scanner := bufio.NewScanner(stdin)
 
@@ -60,7 +60,7 @@ func Read(flagValue flag.Value, stdin *os.File) []platform.Content {
 			if currentContent != nil {
 				contents = append(contents, *currentContent)
 			}
-			currentContent = &platform.Content{}
+			currentContent = &review.Content{}
 			lineCounter = 1
 
 			// キャプチャグループから Issue を生成

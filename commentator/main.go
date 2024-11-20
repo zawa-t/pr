@@ -9,36 +9,33 @@ import (
 	"github.com/zawa-t/pr/commentator/src/format"
 	"github.com/zawa-t/pr/commentator/src/format/json"
 	"github.com/zawa-t/pr/commentator/src/format/text"
-	"github.com/zawa-t/pr/commentator/src/platform"
-	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
 	bitbucketClient "github.com/zawa-t/pr/commentator/src/platform/bitbucket/client"
-	"github.com/zawa-t/pr/commentator/src/platform/github"
 	githubClient "github.com/zawa-t/pr/commentator/src/platform/github/client"
 	"github.com/zawa-t/pr/commentator/src/platform/http"
-	"github.com/zawa-t/pr/commentator/src/platform/local"
+	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/review/role"
 )
 
 /*
 以下、動作確認用コマンド
 ```
-$ go build -o commentator
+$ go build -o pr-postman
 
 <json>
-$ ./commentator -n=golangci-lint -f=json -t=golangci-lint -r=local-reviewer < sample/sample.json
+$ ./pr-postman -r=local-commentator -n=golangci-lint -f=json -t=golangci-lint < sample/sample.json
 
 <text>
-$ ./commentator -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-reviewer < sample/golangci-lint_line-number.txt
+$ ./pr-postman -r=local-commentator -n=golangci-lint -efm="%f:%l:%c: %m" < sample/golangci-lint_line-number.txt
 ```
 */
 
 /*
 TODO:
-・githubにanotationコメントを入れられるようにする
 ・githubも同じコメントは1回しか入らないようにする
-・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む）
+・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
+・CustomCommentTextの共通化
 ・BitbucketのGetComment()の並行処理化
-・環境変数不足時のログが必要な分しかwarnが出ないように変更（githubのときはgithubで必要な環境変数だけ）
 */
 
 func main() {
@@ -63,17 +60,17 @@ func main() {
 	if len(data.Contents) == 0 {
 		slog.Info("No comments were added. This is because there is no data to comment on.")
 	} else {
-		if err := newPullRequest(flagValue.Reviewer).AddComments(context.Background(), data); err != nil {
+		if err := newReviewer(flagValue.Role).Review(context.Background(), data); err != nil {
 			slog.Error("Failed to add comments.", "error", err.Error())
 			os.Exit(1)
 		}
 
-		slog.Info("The pull request comments were successfully added.")
+		slog.Info("completed.")
 	}
 }
 
-func newData(flagValue flag.Value, stdin *os.File) platform.Data {
-	data := platform.Data{
+func newData(flagValue flag.Value, stdin *os.File) review.Data {
+	data := review.Data{
 		Name: flagValue.Name,
 	}
 
@@ -89,16 +86,16 @@ func newData(flagValue flag.Value, stdin *os.File) platform.Data {
 	return data
 }
 
-func newPullRequest(reviewer string) (pr *platform.PullRequest) {
-	switch reviewer {
-	case platform.LocalReviewer:
-		pr = platform.NewPullRequest(local.NewReview())
-	case platform.GithubReviewer:
-		pr = platform.NewPullRequest(github.NewReview(githubClient.NewCustomClient(http.NewClient())))
-	case platform.BitbucketReviewer:
-		pr = platform.NewPullRequest(bitbucket.NewReview(bitbucketClient.NewCustomClient(http.NewClient())))
+func newReviewer(roleName string) (reviewer review.Reviewer) {
+	switch roleName {
+	case role.LocalCommentator:
+		reviewer = role.NewLocalCommentator()
+	case role.GithubPRCommentator:
+		reviewer = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
+	case role.BitbucketPRCommentator:
+		reviewer = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
 	default:
-		slog.Error("Unsupported reviewer was set.")
+		slog.Error("Unsupported role was set.")
 		os.Exit(1)
 	}
 	return

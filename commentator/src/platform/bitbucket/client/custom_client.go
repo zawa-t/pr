@@ -7,7 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/zawa-t/pr/commentator/src/env"
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/errors"
 	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
 	"github.com/zawa-t/pr/commentator/src/platform/http"
 	"github.com/zawa-t/pr/commentator/src/platform/http/url"
@@ -36,7 +36,7 @@ func (c *Custom) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
 			return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 		}
 
-		req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+		req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 		httpRes, err := c.httpClient.Send(ctx, req)
 		if err != nil {
@@ -46,7 +46,7 @@ func (c *Custom) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
 		if httpRes.StatusCode != 200 {
 			slog.Warn("Failed to retrieve comments.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
 			if httpRes.StatusCode == 404 {
-				return nil, platform.ErrNotFound
+				return nil, errors.ErrNotFound
 			}
 			return nil, fmt.Errorf("failed to retrieve comments")
 		}
@@ -84,7 +84,7 @@ func (c *Custom) PostComment(ctx context.Context, data bitbucket.CommentData) er
 	}
 
 	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+	req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 	res, err := c.httpClient.Send(ctx, req)
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *Custom) UpsertReport(ctx context.Context, reportID string, data bitbuck
 	}
 
 	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+	req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)
 	if err != nil {
@@ -137,7 +137,7 @@ func (c *Custom) GetReport(ctx context.Context, reportID string) (*bitbucket.Ann
 		return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+	req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)
 	if err != nil {
@@ -147,7 +147,7 @@ func (c *Custom) GetReport(ctx context.Context, reportID string) (*bitbucket.Ann
 	if httpRes.StatusCode != 200 {
 		slog.Warn("Failed to retrieve report.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
 		if httpRes.StatusCode == 404 {
-			return nil, platform.ErrNotFound
+			return nil, errors.ErrNotFound
 		}
 		return nil, fmt.Errorf("failed to retrieve report")
 	}
@@ -171,7 +171,7 @@ func (c *Custom) DeleteReport(ctx context.Context, reportID string) error {
 		return fmt.Errorf("failed to exec http.NewRequest(): %w", err)
 	}
 
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+	req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)
 	if err != nil {
@@ -199,7 +199,7 @@ func (c *Custom) BulkUpsertAnnotations(ctx context.Context, datas []bitbucket.An
 	}
 
 	req.SetHeader(http.Header().Add(http.RequestHeader.ContentType, http.ApplicationJSON))
-	req.SetBasicAuth(env.BitbucketUserName, env.BitbucketAppPassword)
+	req.SetBasicAuth(env.Bitbucket.UserName, env.Bitbucket.AppPassword)
 
 	httpRes, err := c.httpClient.Send(ctx, req)
 	if err != nil {

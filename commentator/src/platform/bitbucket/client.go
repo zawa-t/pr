@@ -101,15 +101,15 @@ type PullRequestComments struct {
 }
 
 type Comment struct {
-	ID          int         `json:"id"`
-	CreatedOn   time.Time   `json:"created_on"`
-	UpdatedOn   time.Time   `json:"updated_on"`
-	Content     Content     `json:"content"`
-	User        User        `json:"user"`
-	Deleted     bool        `json:"deleted"`
-	Inline      Inline      `json:"inline"`
-	Type        string      `json:"type"`
-	PullRequest PullRequest `json:"pullrequest"`
+	ID          int       `json:"id"`
+	CreatedOn   time.Time `json:"created_on"`
+	UpdatedOn   time.Time `json:"updated_on"`
+	Content     Content   `json:"content"`
+	User        User      `json:"user"`
+	Deleted     bool      `json:"deleted"`
+	Inline      Inline    `json:"inline"`
+	Type        string    `json:"type"`
+	PullRequest PR        `json:"pullrequest"`
 	// Resolution  struct {
 	// 	Type string `json:""`
 	// }
@@ -129,7 +129,7 @@ type User struct {
 
 // }
 
-type PullRequest struct {
+type PR struct {
 	Type  string `json:"type"`
 	ID    int    `json:"id"`
 	Title string `json:"title"`

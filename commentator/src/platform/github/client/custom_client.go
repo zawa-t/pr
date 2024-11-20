@@ -38,7 +38,7 @@ func (c *Custom) CreateComment(ctx context.Context, data github.CommentData) err
 			// Add(http.RequestHeader.ContentType, http.ApplicationJSON).
 			Add(http.RequestHeader.Accept, "application/vnd.github+json").
 			Add("X-GitHub-Api-Version", "2022-11-28").
-			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.GithubAPIToken)),
+			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.Github.APIToken)),
 	)
 
 	res, err := c.httpClient.Send(ctx, req)
@@ -70,7 +70,7 @@ func (c *Custom) CreateReview(ctx context.Context, data github.ReviewData) error
 		http.Header().
 			Add(http.RequestHeader.Accept, "application/vnd.github+json").
 			Add("X-GitHub-Api-Version", "2022-11-28").
-			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.GithubAPIToken)),
+			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.Github.APIToken)),
 	)
 
 	res, err := c.httpClient.Send(ctx, req)
@@ -102,7 +102,7 @@ func (c *Custom) CreateCheckRun(ctx context.Context, data github.POSTCheckRuns) 
 		http.Header().
 			Add(http.RequestHeader.Accept, "application/vnd.github+json").
 			Add("X-GitHub-Api-Version", "2022-11-28").
-			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.GithubAPIToken)),
+			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.Github.APIToken)),
 	)
 
 	res, err := c.httpClient.Send(ctx, req)

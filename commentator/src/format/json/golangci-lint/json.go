@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr/commentator/src/platform"
+	"github.com/zawa-t/pr/commentator/src/review"
 )
 
 type JSON struct {
@@ -43,10 +43,10 @@ func Decode(stdin *os.File) JSON {
 	return jsonData
 }
 
-func MakeContents(customTextFormat *string, issues []Issue) []platform.Content {
-	contents := make([]platform.Content, 0)
+func MakeContents(customTextFormat *string, issues []Issue) []review.Content {
+	contents := make([]review.Content, 0)
 	for _, v := range issues {
-		data := platform.Content{
+		data := review.Content{
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,
