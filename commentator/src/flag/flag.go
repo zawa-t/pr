@@ -131,7 +131,7 @@ func (v *Value) validate() {
 		}
 	}
 
-	allowedRoleNames := []string{role.BitbucketPRCommentator, role.GithubPRCommentator, role.LocalCommentator}
+	allowedRoleNames := []string{role.LocalCommentator, role.BitbucketPRCommentator, role.GithubPRCommentator, role.GithubPRChecker, role.GithubChecker}
 	if !slices.Contains(allowedRoleNames, v.Role) {
 		slog.Error("The specified role is not supported.", "role", v.Role)
 		os.Exit(1)
