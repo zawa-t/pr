@@ -90,10 +90,14 @@ func newReviewer(roleName string) (reviewer review.Reviewer) {
 	switch roleName {
 	case role.LocalCommentator:
 		reviewer = role.NewLocalCommentator()
-	case role.GithubPRCommentator:
-		reviewer = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
 	case role.BitbucketPRCommentator:
 		reviewer = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
+	case role.GithubPRCommentator:
+		reviewer = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
+	case role.GithubPRChecker:
+		reviewer = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
+	case role.GithubChecker:
+		reviewer = role.NewGithubChecker(githubClient.NewCustomClient(http.NewClient()))
 	default:
 		slog.Error("Unsupported role was set.")
 		os.Exit(1)
