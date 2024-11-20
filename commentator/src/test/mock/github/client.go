@@ -28,6 +28,9 @@ var _ github.Client = &ClientMock{}
 //			CreateReviewFunc: func(ctx context.Context, data github.ReviewData) error {
 //				panic("mock out the CreateReview method")
 //			},
+//			GetPRCommentsFunc: func(ctx context.Context) ([]github.GetPRCommentResponse, error) {
+//				panic("mock out the GetPRComments method")
+//			},
 //		}
 //
 //		// use mockedClient in code that requires github.Client
@@ -43,6 +46,9 @@ type ClientMock struct {
 
 	// CreateReviewFunc mocks the CreateReview method.
 	CreateReviewFunc func(ctx context.Context, data github.ReviewData) error
+
+	// GetPRCommentsFunc mocks the GetPRComments method.
+	GetPRCommentsFunc func(ctx context.Context) ([]github.GetPRCommentResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -67,10 +73,16 @@ type ClientMock struct {
 			// Data is the data argument value.
 			Data github.ReviewData
 		}
+		// GetPRComments holds details about calls to the GetPRComments method.
+		GetPRComments []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
 	}
 	lockCreateCheckRun sync.RWMutex
 	lockCreateComment  sync.RWMutex
 	lockCreateReview   sync.RWMutex
+	lockGetPRComments  sync.RWMutex
 }
 
 // CreateCheckRun calls CreateCheckRunFunc.
@@ -178,5 +190,37 @@ func (mock *ClientMock) CreateReviewCalls() []struct {
 	mock.lockCreateReview.RLock()
 	calls = mock.calls.CreateReview
 	mock.lockCreateReview.RUnlock()
+	return calls
+}
+
+// GetPRComments calls GetPRCommentsFunc.
+func (mock *ClientMock) GetPRComments(ctx context.Context) ([]github.GetPRCommentResponse, error) {
+	if mock.GetPRCommentsFunc == nil {
+		panic("ClientMock.GetPRCommentsFunc: method is nil but Client.GetPRComments was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockGetPRComments.Lock()
+	mock.calls.GetPRComments = append(mock.calls.GetPRComments, callInfo)
+	mock.lockGetPRComments.Unlock()
+	return mock.GetPRCommentsFunc(ctx)
+}
+
+// GetPRCommentsCalls gets all the calls that were made to GetPRComments.
+// Check the length with:
+//
+//	len(mockedClient.GetPRCommentsCalls())
+func (mock *ClientMock) GetPRCommentsCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockGetPRComments.RLock()
+	calls = mock.calls.GetPRComments
+	mock.lockGetPRComments.RUnlock()
 	return calls
 }

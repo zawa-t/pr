@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -35,7 +36,6 @@ func (c *Custom) CreateComment(ctx context.Context, data github.CommentData) err
 
 	req.SetHeader(
 		http.Header().
-			// Add(http.RequestHeader.ContentType, http.ApplicationJSON).
 			Add(http.RequestHeader.Accept, "application/vnd.github+json").
 			Add("X-GitHub-Api-Version", "2022-11-28").
 			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.Github.APIToken)),
@@ -52,6 +52,43 @@ func (c *Custom) CreateComment(ctx context.Context, data github.CommentData) err
 	}
 
 	return nil
+}
+
+// GetPRComments ...
+func (c *Custom) GetPRComments(ctx context.Context) ([]github.GetPRCommentResponse, error) {
+	parsedURL, err := url.New(prCommentURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to exec url.New(): %w", err)
+	}
+
+	req, err := http.NewRequest(http.Method.GET, parsedURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to exec http.NewRequest(): %w", err)
+	}
+
+	req.SetHeader(
+		http.Header().
+			Add(http.RequestHeader.Accept, "application/vnd.github+json").
+			Add("X-GitHub-Api-Version", "2022-11-28").
+			Add(http.RequestHeader.Authorization, fmt.Sprintf("Bearer %s", env.Github.APIToken)),
+	)
+
+	httpRes, err := c.httpClient.Send(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to exec c.httpClient.Send(): %w", err)
+	}
+
+	if httpRes.StatusCode != 200 {
+		slog.Error("Failed to get comment.", "req", fmt.Sprintf("URL: %s", parsedURL.String()), "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
+		return nil, fmt.Errorf("failed to get comments")
+	}
+
+	var res []github.GetPRCommentResponse
+	if err := json.Unmarshal(httpRes.Body, &res); err != nil {
+		return nil, fmt.Errorf("failed to exec json.Unmarshal(): %w", err)
+	}
+
+	return res, nil
 }
 
 // CreateReview ...

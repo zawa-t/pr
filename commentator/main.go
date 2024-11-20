@@ -22,16 +22,18 @@ import (
 $ go build -o pr-postman
 
 <json>
-$ ./pr-postman -r=local-commentator -n=golangci-lint -f=json -t=golangci-lint < sample/sample.json
+$ ./pr-postman -n=golangci-lint -f=json -t=golangci-lint -r=local-commentator < sample/sample.json
 
 <text>
-$ ./pr-postman -r=local-commentator -n=golangci-lint -efm="%f:%l:%c: %m" < sample/golangci-lint_line-number.txt
+$ ./pr-postman -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-commentator < sample/golangci-lint_line-number.txt
 ```
 */
 
 /*
 TODO:
-・githubも同じコメントは1回しか入らないようにする
+・github-pr-checkerとgithub-checkerの整備
+・テスト追加
+・ローカルではすべての環境変数が使用できるように修正
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
 ・CustomCommentTextの共通化
