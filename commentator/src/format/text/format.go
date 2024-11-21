@@ -77,7 +77,7 @@ func Read(flagValue flag.Value, stdin *os.File) []review.Content {
 				case "Column":
 					currentContent.ColumnNum = toUint(value)
 				case "Message":
-					currentContent.Message = value
+					currentContent.Text = value
 				}
 			}
 			currentContent.Linter = flagValue.Name

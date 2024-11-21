@@ -3,6 +3,7 @@ package review
 
 import (
 	"context"
+	"fmt"
 )
 
 // Reviewer ...
@@ -24,7 +25,17 @@ type Content struct {
 	ColumnNum uint
 	CodeLine  string
 	Indicator string
-	Message   string
+	Text      string
 
 	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
+}
+
+func (c Content) Message() string {
+	var text string
+	if c.CustomCommentText != nil {
+		text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *c.CustomCommentText)
+	} else {
+		text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", c.FilePath, c.LineNum, c.Linter, c.Text) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
+	}
+	return text
 }

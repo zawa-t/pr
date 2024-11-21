@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/zawa-t/pr/commentator/src/errors"
 	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
 	"github.com/zawa-t/pr/commentator/src/review"
 )
@@ -44,7 +43,7 @@ func (b *bitbucketPRCommentator) Review(ctx context.Context, input review.Data) 
 func (b *bitbucketPRCommentator) createReport(ctx context.Context, input review.Data, reportID string) error {
 	reportData := bitbucket.ReportData{
 		Title:      fmt.Sprintf("[%s] PR-Commentator report", input.Name),
-		Details:    "Meow-Meow! This report generated for you by pr-commentator.", // TODO: 内容については要検討
+		Details:    "This report generated for you by pr-commentator.", // TODO: 内容については要検討
 		ReportType: "TEST",
 	}
 
@@ -54,16 +53,17 @@ func (b *bitbucketPRCommentator) createReport(ctx context.Context, input review.
 		reportData.Result = "FAILED"
 	}
 
-	// 存在確認
-	existingReport, err := b.client.GetReport(ctx, reportID)
-	if err != nil && err.Error() != errors.ErrNotFound.Error() { // TODO: err.Error() != platform.ErrNotFound.Error に errors.Is() が使えるやり方を検討
-		return fmt.Errorf("failed to exec r.client.getReport(): %w", err)
-	}
-	if existingReport != nil {
-		if err := b.client.DeleteReport(ctx, reportID); err != nil {
-			return fmt.Errorf("failed to exec r.client.deleteReport(): %w", err)
-		}
-	}
+	// TODO: 必要なさそうなので、一度コメントアウトして本当に不要であることが確認できたら削除する
+	// // 存在確認
+	// existingReport, err := b.client.GetReport(ctx, reportID)
+	// if err != nil && err.Error() != errors.ErrNotFound.Error() { // TODO: err.Error() != platform.ErrNotFound.Error に errors.Is() が使えるやり方を検討
+	// 	return fmt.Errorf("failed to exec r.client.getReport(): %w", err)
+	// }
+	// if existingReport != nil {
+	// 	if err := b.client.DeleteReport(ctx, reportID); err != nil {
+	// 		return fmt.Errorf("failed to exec r.client.deleteReport(): %w", err)
+	// 	}
+	// }
 
 	if err := b.client.UpsertReport(ctx, reportID, reportData); err != nil {
 		return fmt.Errorf("failed to exec r.client.upsertReport(): %w", err)
@@ -83,7 +83,7 @@ func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input revie
 			Path:           data.FilePath,
 			Line:           data.LineNum,
 			Summary:        fmt.Sprintf("%s find problem", data.Linter),
-			Details:        fmt.Sprintf("%s（%s）", data.Message, data.Linter),
+			Details:        fmt.Sprintf("%s（%s）", data.Text, data.Linter),
 			AnnotationType: "BUG",
 			Result:         "FAILED",
 			Severity:       "HIGH",
@@ -115,13 +115,7 @@ func (b *bitbucketPRCommentator) addComments(ctx context.Context, input review.D
 
 	comments := make([]bitbucket.CommentData, 0)
 	for _, content := range input.Contents {
-		var text string
-		if content.CustomCommentText != nil {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *content.CustomCommentText)
-		} else {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", content.FilePath, content.LineNum, content.Linter, content.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
-		}
-
+		text := content.Message()
 		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, text)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments = append(comments, bitbucket.CommentData{

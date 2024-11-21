@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func PrintJSON(name string, v any) {
+func PrintJSON(msg string, v any) {
 	data, err := json.Marshal(v)
 	if err != nil {
 		slog.Error("Faild to exec json.Marshal().", "error", err.Error())
@@ -17,6 +17,6 @@ func PrintJSON(name string, v any) {
 	if err != nil {
 		slog.Error("Faild to exec json.Indent().", "error", err.Error())
 	}
-	slog.Info(fmt.Sprintf("The data was binded to a struct (%s).", name)) // TODO: 最終的にはDebugログにしたい
+	slog.Debug(msg)
 	fmt.Println(buf.String())
 }

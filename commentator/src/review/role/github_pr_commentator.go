@@ -38,22 +38,16 @@ func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) err
 	}
 
 	comments := make([]github.CommentData, len(input.Contents))
-	for i, data := range input.Contents {
-		var text string
-		if data.CustomCommentText != nil { // HACK: bitbucketと同じ内容のため共通化したい
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *data.CustomCommentText)
-		} else {
-			text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", data.FilePath, data.LineNum, data.Linter, data.Message) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
-		}
-
-		commentID := fmt.Sprintf("%s:%d:%s", data.FilePath, data.LineNum, text)
+	for i, content := range input.Contents {
+		text := content.Message()
+		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, text)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments[i] = github.CommentData{
 				Body:        text,
 				CommitID:    env.Github.CommitID,
-				Path:        data.FilePath,
-				StartLine:   data.LineNum,
-				Line:        data.LineNum + 1, // TODO: これで本当に良いか検討
+				Path:        content.FilePath,
+				StartLine:   content.LineNum,
+				Line:        content.LineNum + 1, // TODO: これで本当に良いか検討
 				Position:    5,
 				SubjectType: "line",
 			}

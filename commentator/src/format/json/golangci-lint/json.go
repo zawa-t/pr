@@ -50,7 +50,7 @@ func MakeContents(customTextFormat *string, issues []Issue) []review.Content {
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,
-			Message:  v.Text,
+			Text:     v.Text,
 		}
 		if customTextFormat != nil {
 			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat) // HACK: 本来はfor文のたびにParseをする必要はないため、for文の外でParseするようにできないか検討
