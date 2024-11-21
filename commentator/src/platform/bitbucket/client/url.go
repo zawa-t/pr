@@ -7,11 +7,11 @@ import (
 	"github.com/zawa-t/pr/commentator/src/platform/http/url"
 )
 
-var baseURL = fmt.Sprintf("https://api.bitbucket.org/2.0/repositories/%s/%s", env.Bitbucket.Workspace, env.Bitbucket.RepositoryName)
+var baseURL = fmt.Sprintf("https://api.bitbucket.org/2.0/repositories/%s/%s", env.Bitbucket.WorkspaceName, env.Bitbucket.RepositoryName)
 
 var (
-	prCommentPath = fmt.Sprintf("/pullrequests/%d/comments", env.Bitbucket.PRID)
-	reportPath    = fmt.Sprintf("/commit/%s/reports", env.Bitbucket.Commit)
+	prCommentPath = fmt.Sprintf("/pullrequests/%s/comments", env.Bitbucket.PRID)
+	reportPath    = fmt.Sprintf("/commit/%s/reports", env.Bitbucket.CommitID)
 )
 
 var (

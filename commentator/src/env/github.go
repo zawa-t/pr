@@ -8,7 +8,7 @@ import (
 )
 
 type GithubConfig struct {
-	Repository        string
+	RepositoryName    string
 	PullRequestNumber string
 	CommitID          string
 	APIToken          string
@@ -17,10 +17,10 @@ type GithubConfig struct {
 var Github GithubConfig
 
 func init() {
-	if os.Getenv("GITHUB_ACTIONS") == "true" {
+	if os.Getenv("GITHUB_ACTIONS") == "true" || Env.IsLocal() {
 		Github = GithubConfig{
-			Repository: getEnv("GITHUB_REPOSITORY"),
-			APIToken:   getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN"),
+			RepositoryName: getEnv("GITHUB_REPOSITORY"),
+			APIToken:       getEnv("PR_COMMENTATOR_GITHUB_API_TOKEN"),
 		}
 
 		Github.PullRequestNumber, Github.CommitID = getGithubPRNumber()

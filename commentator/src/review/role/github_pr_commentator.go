@@ -2,6 +2,7 @@ package role
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 
@@ -59,14 +60,14 @@ func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) err
 		}
 	}
 
-	// var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
-	// for _, comment := range comments {
-	// 	if err := g.client.CreateComment(ctx, comment); err != nil {
-	// 		multiErr = errors.Join(multiErr, err)
-	// 	}
-	// }
-	// if multiErr != nil {
-	// 	return multiErr
-	// }
+	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	for _, comment := range comments {
+		if err := g.client.CreateComment(ctx, comment); err != nil {
+			multiErr = errors.Join(multiErr, err)
+		}
+	}
+	if multiErr != nil {
+		return multiErr
+	}
 	return nil
 }

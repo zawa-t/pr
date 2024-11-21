@@ -7,7 +7,7 @@ import (
 	"github.com/zawa-t/pr/commentator/src/platform/http/url"
 )
 
-var baseURL = fmt.Sprintf("https://api.github.com/repos/%s", env.Github.Repository)
+var baseURL = fmt.Sprintf("https://api.github.com/repos/%s", env.Github.RepositoryName)
 
 var (
 	prCommentPath = fmt.Sprintf("/pulls/%s/comments", env.Github.PullRequestNumber)
