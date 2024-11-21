@@ -26,7 +26,7 @@ type Content struct {
 	ColumnNum uint
 	CodeLine  string
 	Indicator string
-	Text      string
+	Message   string
 }
 
 func DefaultMessage(filePath string, lineNum uint, linter string, text string) string {

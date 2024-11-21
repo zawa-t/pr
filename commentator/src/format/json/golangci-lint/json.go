@@ -50,7 +50,7 @@ func MakeContents(customTextFormat *string, issues []Issue) []review.Content {
 			Linter:   v.FromLinter,
 			FilePath: v.Pos.Filename,
 			LineNum:  v.Pos.Line,
-			Text:     review.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, v.Text),
+			Message:  review.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, v.Text),
 		}
 		if customTextFormat != nil {
 			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat) // HACK: 本来はfor文のたびにParseをする必要はないため、for文の外でParseするようにできないか検討
@@ -65,7 +65,7 @@ func MakeContents(customTextFormat *string, issues []Issue) []review.Content {
 				fmt.Println("Error executing template:", err)
 				os.Exit(1)
 			}
-			data.Text = review.CustomMessage(result.String())
+			data.Message = review.CustomMessage(result.String())
 		}
 		contents = append(contents, data)
 	}

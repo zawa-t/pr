@@ -77,7 +77,7 @@ func Read(flagValue flag.Value, stdin *os.File) []review.Content {
 				case "Column":
 					currentContent.ColumnNum = toUint(value)
 				case "Message":
-					currentContent.Text = value
+					currentContent.Message = value
 				}
 			}
 			currentContent.Linter = flagValue.Name
@@ -88,7 +88,7 @@ func Read(flagValue flag.Value, stdin *os.File) []review.Content {
 		} else if currentContent != nil && lineCounter == 2 {
 			// 3行目：インジケータ行
 			currentContent.Indicator = line
-			currentContent.Text = review.DefaultMessage(currentContent.FilePath, currentContent.LineNum, currentContent.Linter, currentContent.Text)
+			currentContent.Message = review.DefaultMessage(currentContent.FilePath, currentContent.LineNum, currentContent.Linter, currentContent.Message)
 			contents = append(contents, *currentContent)
 
 			// 初期化

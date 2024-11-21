@@ -83,7 +83,7 @@ func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input revie
 			Path:           data.FilePath,
 			Line:           data.LineNum,
 			Summary:        fmt.Sprintf("%s find problem", data.Linter),
-			Details:        fmt.Sprintf("%s（%s）", data.Text, data.Linter),
+			Details:        fmt.Sprintf("%s（%s）", data.Message, data.Linter),
 			AnnotationType: "BUG",
 			Result:         "FAILED",
 			Severity:       "HIGH",
@@ -115,11 +115,11 @@ func (b *bitbucketPRCommentator) addComments(ctx context.Context, input review.D
 
 	comments := make([]bitbucket.CommentData, 0)
 	for _, content := range input.Contents {
-		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, content.Text)
+		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, content.Message)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments = append(comments, bitbucket.CommentData{
 				Content: bitbucket.Content{
-					Raw: content.Text,
+					Raw: content.Message,
 				},
 				Inline: bitbucket.Inline{
 					Path: content.FilePath,

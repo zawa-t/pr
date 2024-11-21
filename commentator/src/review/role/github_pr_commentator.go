@@ -39,10 +39,10 @@ func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) err
 
 	comments := make([]github.CommentData, len(input.Contents))
 	for i, content := range input.Contents {
-		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, content.Text)
+		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, content.Message)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments[i] = github.CommentData{
-				Body:        content.Text,
+				Body:        content.Message,
 				CommitID:    env.Github.CommitID,
 				Path:        content.FilePath,
 				StartLine:   content.LineNum,
