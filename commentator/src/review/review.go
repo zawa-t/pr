@@ -19,6 +19,7 @@ type Data struct {
 
 // Content ...
 type Content struct {
+	ID        string
 	Linter    string
 	FilePath  string
 	LineNum   uint
@@ -26,16 +27,12 @@ type Content struct {
 	CodeLine  string
 	Indicator string
 	Text      string
-
-	CustomCommentText *string // flag値としてユーザーが設定するコメント用のフォーマット
 }
 
-func (c Content) Message() string {
-	var text string
-	if c.CustomCommentText != nil {
-		text = fmt.Sprintf("[*Automatic PR Comment*]  \n%s", *c.CustomCommentText)
-	} else {
-		text = fmt.Sprintf("[*Automatic PR Comment*]  \n*・File:* %s（%d）  \n*・Linter:* %s  \n*・Details:* %s", c.FilePath, c.LineNum, c.Linter, c.Text) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
-	}
-	return text
+func DefaultMessage(filePath string, lineNum uint, linter string, text string) string {
+	return fmt.Sprintf("[Automatic PR Comment]  \n・File: %s（%d）  \n・Linter: %s  \n・Details: %s", filePath, lineNum, linter, text) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
+}
+
+func CustomMessage(customText string) string {
+	return fmt.Sprintf("[Automatic PR Comment]  \n%s", customText)
 }

@@ -88,6 +88,7 @@ func Read(flagValue flag.Value, stdin *os.File) []review.Content {
 		} else if currentContent != nil && lineCounter == 2 {
 			// 3行目：インジケータ行
 			currentContent.Indicator = line
+			currentContent.Text = review.DefaultMessage(currentContent.FilePath, currentContent.LineNum, currentContent.Linter, currentContent.Text)
 			contents = append(contents, *currentContent)
 
 			// 初期化

@@ -115,12 +115,11 @@ func (b *bitbucketPRCommentator) addComments(ctx context.Context, input review.D
 
 	comments := make([]bitbucket.CommentData, 0)
 	for _, content := range input.Contents {
-		text := content.Message()
-		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, text)
+		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, content.Text)
 		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
 			comments = append(comments, bitbucket.CommentData{
 				Content: bitbucket.Content{
-					Raw: text,
+					Raw: content.Text,
 				},
 				Inline: bitbucket.Inline{
 					Path: content.FilePath,

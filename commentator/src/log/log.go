@@ -17,6 +17,6 @@ func PrintJSON(msg string, v any) {
 	if err != nil {
 		slog.Error("Faild to exec json.Indent().", "error", err.Error())
 	}
-	slog.Debug(msg)
+	slog.Info(msg)
 	fmt.Println(buf.String())
 }
