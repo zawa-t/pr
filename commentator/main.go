@@ -33,7 +33,6 @@ $ ./pr-postman -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-commentator < sampl
 TODO:
 ・github-pr-checkerとgithub-checkerの整備
 ・テスト追加
-・ローカルではすべての環境変数が使用できるように修正
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
 ・CustomCommentTextの共通化
