@@ -1,9 +1,9 @@
 package role
 
 const (
-	LocalCommentator       = "local-commentator"
-	BitbucketPRCommentator = "bitbucket-pr-commentator"
-	GithubPRCommentator    = "github-pr-commentator"
-	GithubPRChecker        = "github-pr-checker"
-	GithubChecker          = "github-checker"
+	LocalCommentator       = "local-comment"
+	BitbucketPRCommentator = "bitbucket-pr-comment"
+	GithubPRCommentator    = "github-pr-comment"
+	GithubPRChecker        = "github-pr-check"
+	GithubChecker          = "github-check"
 )

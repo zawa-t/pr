@@ -20,19 +20,20 @@ import (
 /*
 以下、動作確認用コマンド
 ```
-$ go build -o pr-postman
+$ go build -o reporter
 
 <json>
-$ ./pr-postman -n=golangci-lint -f=json -t=golangci-lint -r=local-commentator < sample/sample.json
+$ ./reporter -n=golangci-lint -f=json -t=golangci-lint -r=local-comment < sample/golangci-lint_json.json
 
 <text>
-$ ./pr-postman -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-commentator < sample/golangci-lint_line-number.txt
+$ ./reporter -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-comment < sample/golangci-lint_line-number.txt
 ```
 */
 
 /*
 TODO:
-・github-pr-checkerとgithub-checkerの整備
+・-vオプションでのバージョン表示
+・github-pr-checkとgithub-checkの整備
 ・テスト追加
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
