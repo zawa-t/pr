@@ -21,14 +21,14 @@ func NewGithubChecker(c github.Client) *githubChecker {
 // Review ...
 func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 	postheckRuns := github.POSTCheckRuns{
-		Name:       "xxxx",
-		HeadSHA:    env.Github.CommitID,
-		Status:     "completed",
-		Conclusion: "failure",
+		Name:    input.Name,
+		HeadSHA: env.Github.CommitID,
+		Status:  "requested",
+		// Conclusion: "failure",
 		Output: github.CheckRunsOutput{
-			Title:   input.Name,
-			Summary: "",
-			Text:    "",
+			Title:   "Title",
+			Summary: "Summary",
+			Text:    "xxxxxxxxxxx",
 		},
 	}
 
@@ -40,7 +40,7 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 			EndLine:         int(content.LineNum) + 1,
 			AnnotationLevel: "warning",
 			Message:         content.Message.String(),
-			Title:           input.Name,
+			Title:           content.Linter,
 			// RawDetails:      "",
 		}
 	}
