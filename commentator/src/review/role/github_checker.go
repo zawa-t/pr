@@ -21,10 +21,10 @@ func NewGithubChecker(c github.Client) *githubChecker {
 // Review ...
 func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 	postheckRuns := github.POSTCheckRuns{
-		Name:    input.Name,
-		HeadSHA: env.Github.CommitID,
-		Status:  "requested",
-		// Conclusion: "failure",
+		Name:       input.Name,
+		HeadSHA:    env.Github.CommitID,
+		Status:     "completed",
+		Conclusion: "failure",
 		Output: github.CheckRunsOutput{
 			Title:   "Title",
 			Summary: "Summary",
