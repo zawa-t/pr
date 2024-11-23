@@ -10,10 +10,10 @@ import (
 	"github.com/zawa-t/pr/commentator/src/review/role"
 )
 
-var usage = "Usage: commentator --name=[tool name] --input-format=[input format] --role=[role name] < inputfile"
+var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role=[role name] < inputfile"
 
 type Required struct {
-	Name, InputFormat, Role string
+	ToolName, InputFormat, Role string
 }
 
 type Optional struct {
@@ -27,10 +27,10 @@ type Value struct {
 
 func NewValue() (value *Value) {
 	// Required
-	var name string
-	nameFlags := []string{"n", "name"}
-	for _, f := range nameFlags {
-		flag.StringVar(&name, f, "", "The tool name for static code analysis. The flag is required.")
+	var toolName string
+	toolNameFlags := []string{"n", "tool-name"}
+	for _, f := range toolNameFlags {
+		flag.StringVar(&toolName, f, "", "The tool name for static code analysis. The flag is required.")
 	}
 
 	var inputFormat string
@@ -71,7 +71,7 @@ func NewValue() (value *Value) {
 
 	value = &Value{
 		Required: Required{
-			Name:        name,
+			ToolName:    toolName,
 			InputFormat: inputFormat,
 			Role:        role,
 		},
@@ -102,7 +102,7 @@ func NewValue() (value *Value) {
 }
 
 func (v *Value) validate() {
-	if v.Name == "" || v.InputFormat == "" || v.Role == "" {
+	if v.ToolName == "" || v.InputFormat == "" || v.Role == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
@@ -126,7 +126,7 @@ func (v *Value) validate() {
 
 		allowedFormatTypes := []string{"golangci-lint"}
 		if !slices.Contains(allowedFormatTypes, *v.FormatType) {
-			slog.Error("The specified format-type is not supported.", "name", *v.FormatType)
+			slog.Error("The specified format-type is not supported.", "format-type", *v.FormatType)
 			os.Exit(1)
 		}
 	}

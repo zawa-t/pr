@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log/slog"
-	"os"
+	"io"
 
 	"github.com/zawa-t/pr/commentator/src/review"
 )
@@ -21,53 +20,61 @@ type Issue struct {
 	Severity    string   `json:"Severity"`
 	SourceLines []string `json:"SourceLines"`
 	// Replacement ? // NOTE: 型や使用方法が不明のため一旦コメントアウト
-	Pos          Pos  `json:"Pos"`
-	ExpectNoLint bool `json:"ExpectNoLint"`
-}
-
-type Pos struct {
-	Filename             string `json:"Filename"`
-	Offset               uint   `json:"Offset"`
-	Line                 uint   `json:"Line"`
-	Column               uint   `json:"Column"`
+	Pos                  Pos    `json:"Pos"`
+	ExpectNoLint         bool   `json:"ExpectNoLint"`
 	ExpectedNoLintLinter string `json:"ExpectedNoLintLinter"`
 }
 
-func Decode(stdin *os.File) JSON {
-	var jsonData JSON
-	decoder := json.NewDecoder(stdin)
-	if err := decoder.Decode(&jsonData); err != nil {
-		slog.Error("Failed to JSON Decode.", "error", err.Error())
-		os.Exit(1)
-	}
-	return jsonData
+type Pos struct {
+	Filename string `json:"Filename"`
+	Offset   uint   `json:"Offset"`
+	Line     uint   `json:"Line"`
+	Column   uint   `json:"Column"`
 }
 
-func MakeContents(customTextFormat *string, issues []Issue) []review.Content {
+func Decode(stdin io.Reader) (*JSON, error) {
+	var jsonData JSON
+	if err := json.NewDecoder(stdin).Decode(&jsonData); err != nil {
+		return nil, fmt.Errorf("failed to Decode() :%w", err)
+	}
+	return &jsonData, nil
+}
+
+func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]review.Content, error) {
 	contents := make([]review.Content, 0)
 	for _, v := range issues {
-		data := review.Content{
-			Linter:   v.FromLinter,
-			FilePath: v.Pos.Filename,
-			LineNum:  v.Pos.Line,
-			Message:  review.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, v.Text),
-		}
+		var message review.Message
 		if customTextFormat != nil {
-			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat) // HACK: 本来はfor文のたびにParseをする必要はないため、for文の外でParseするようにできないか検討
+			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat)
 			if err != nil {
-				fmt.Println("Error parsing template:", err)
-				os.Exit(1)
+				return nil, fmt.Errorf("failed to Parse(): %w", err)
 			}
 
 			var result bytes.Buffer
 			err = tmpl.Execute(&result, v)
 			if err != nil {
-				fmt.Println("Error executing template:", err)
-				os.Exit(1)
+				return nil, fmt.Errorf("failed to Execute(): %w", err)
 			}
-			data.Message = review.CustomMessage(result.String())
+			message = review.CustomMessage(result.String())
+		} else {
+			var text string
+			if alternativeText != nil {
+				text = *alternativeText
+			} else {
+				text = v.Text
+			}
+			message = review.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, text)
+		}
+
+		data := review.Content{
+			ID:        review.NewID(v.Pos.Filename, v.Pos.Line, message),
+			Linter:    v.FromLinter,
+			FilePath:  v.Pos.Filename,
+			LineNum:   v.Pos.Line,
+			ColumnNum: v.Pos.Column,
+			Message:   message,
 		}
 		contents = append(contents, data)
 	}
-	return contents
+	return contents, nil
 }

@@ -39,7 +39,7 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 			StartLine:       int(content.LineNum),
 			EndLine:         int(content.LineNum) + 1,
 			AnnotationLevel: "warning",
-			Message:         content.Message,
+			Message:         content.Message.String(),
 			Title:           input.Name,
 			// RawDetails:      "",
 		}
