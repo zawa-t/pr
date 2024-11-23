@@ -23,7 +23,7 @@ func (g *githubPRChecker) Review(ctx context.Context, input review.Data) error {
 	comments := make([]github.Comment, len(input.Contents))
 	for i, content := range input.Contents {
 		comments[i] = github.Comment{
-			Body:      content.Message(),
+			Body:      content.Message.String(),
 			Path:      content.FilePath,
 			StartLine: content.LineNum,
 			Line:      content.LineNum + 1, // TODO: これで本当に良いか検討

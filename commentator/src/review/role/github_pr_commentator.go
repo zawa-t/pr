@@ -2,11 +2,11 @@ package role
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"slices"
 
 	"github.com/zawa-t/pr/commentator/src/env"
+	"github.com/zawa-t/pr/commentator/src/log"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
 	"github.com/zawa-t/pr/commentator/src/review"
 )
@@ -32,36 +32,36 @@ func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) err
 		return fmt.Errorf("failed to exec r.GetPRComments(): %w", err)
 	}
 
-	existingCommentIDs := make([]string, 0)
+	existingCommentIDs := make([]review.ID, 0)
 	for _, v := range existingComments {
-		existingCommentIDs = append(existingCommentIDs, fmt.Sprintf("%s:%d:%s", v.Path, v.StartLine, v.Body))
+		existingCommentIDs = append(existingCommentIDs, review.ReNewID(v.Path, uint(v.StartLine), v.Body))
 	}
 
-	comments := make([]github.CommentData, len(input.Contents))
-	for i, content := range input.Contents {
-		text := content.Message()
-		commentID := fmt.Sprintf("%s:%d:%s", content.FilePath, content.LineNum, text)
-		if !slices.Contains(existingCommentIDs, commentID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
-			comments[i] = github.CommentData{
-				Body:        text,
+	comments := make([]github.CommentData, 0)
+	for _, content := range input.Contents {
+		if !slices.Contains(existingCommentIDs, content.ID) { // NOTE: すでに同じファイルの同じ行に同じコメントがある場合はコメントしないように制御
+			comments = append(comments, github.CommentData{
+				Body:        content.Message.String(),
 				CommitID:    env.Github.CommitID,
 				Path:        content.FilePath,
 				StartLine:   content.LineNum,
 				Line:        content.LineNum + 1, // TODO: これで本当に良いか検討
 				Position:    5,
 				SubjectType: "line",
-			}
+			})
 		}
 	}
 
-	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
-	for _, comment := range comments {
-		if err := g.client.CreateComment(ctx, comment); err != nil {
-			multiErr = errors.Join(multiErr, err)
-		}
-	}
-	if multiErr != nil {
-		return multiErr
-	}
+	log.PrintJSON("comments", comments)
+
+	// var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	// for _, comment := range comments {
+	// 	if err := g.client.CreateComment(ctx, comment); err != nil {
+	// 		multiErr = errors.Join(multiErr, err)
+	// 	}
+	// }
+	// if multiErr != nil {
+	// 	return multiErr
+	// }
 	return nil
 }

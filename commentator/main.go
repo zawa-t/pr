@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"os"
 
@@ -35,7 +36,6 @@ TODO:
 ・テスト追加
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
-・CustomCommentTextの共通化
 ・BitbucketのGetComment()の並行処理化
 */
 
@@ -70,16 +70,34 @@ func main() {
 	}
 }
 
-func newData(flagValue flag.Value, stdin *os.File) review.Data {
+func newData(flagValue flag.Value, stdin io.Reader) review.Data {
 	data := review.Data{
-		Name: flagValue.Name,
+		Name: flagValue.ToolName,
 	}
 
 	switch flagValue.InputFormat {
 	case format.JSON:
-		data.Contents = json.Decode(flagValue, stdin)
+		config, err := json.NewConfig(flagValue.ToolName, flagValue.FormatType, flagValue.CustomTextFormat, flagValue.AlternativeText)
+		if err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
+		data.Contents, err = json.Decode(stdin, *config)
+		if err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
 	case format.Text:
-		data.Contents = text.Read(flagValue, stdin)
+		config, err := text.NewConfig(flagValue.ToolName, flagValue.ErrorFormat, flagValue.AlternativeText)
+		if err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
+		data.Contents, err = text.Read(stdin, *config)
+		if err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
 	default:
 		slog.Error("The specified input-format is not supported.")
 		os.Exit(1)
