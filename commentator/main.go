@@ -38,6 +38,7 @@ TODO:
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
 ・httpパッケージまわりの整備
 ・BitbucketのGetComment()の並行処理化
+・githubPRReviewerの開発
 */
 
 func main() {

@@ -2,8 +2,9 @@ package role
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/zawa-t/pr/commentator/src/log"
+	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
 	"github.com/zawa-t/pr/commentator/src/review"
 )
@@ -20,25 +21,33 @@ func NewGithubPRChecker(c github.Client) *githubPRChecker {
 
 // Review ...
 func (g *githubPRChecker) Review(ctx context.Context, input review.Data) error {
-	comments := make([]github.Comment, len(input.Contents))
+	postheckRuns := github.POSTCheckRuns{
+		Name:       input.Name,
+		HeadSHA:    env.Github.CommitID,
+		Status:     "completed",
+		Conclusion: "failure",
+		Output: github.CheckRunsOutput{
+			Title:   fmt.Sprintf("[%s] report some issues", input.Name),
+			Summary: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
+			// Text: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
+		},
+	}
+
+	annotations := make([]github.Annotation, len(input.Contents))
 	for i, content := range input.Contents {
-		comments[i] = github.Comment{
-			Body:      content.Message.String(),
-			Path:      content.FilePath,
-			StartLine: content.LineNum,
-			Line:      content.LineNum + 1, // TODO: これで本当に良いか検討
+		annotations[i] = github.Annotation{
+			AnnotationLevel: "warning",
+			Path:            content.FilePath,
+			StartLine:       int(content.LineNum),
+			EndLine:         int(content.LineNum),
+			Title:           fmt.Sprintf("reported by [%s]", content.Linter),
+			Message:         content.Message.String(),
+			// RawDetails:      "",
 		}
 	}
+	postheckRuns.Output.Annotations = annotations
 
-	data := github.ReviewData{
-		Body:     "yyyyy",
-		Event:    "COMMENT",
-		Comments: comments,
-	}
-
-	log.PrintJSON("ReviewData", data)
-
-	if err := g.client.CreateReview(ctx, data); err != nil {
+	if err := g.client.CreateCheckRun(ctx, postheckRuns); err != nil {
 		return err
 	}
 	return nil

@@ -115,7 +115,7 @@ func (c *Custom) CreateReview(ctx context.Context, data github.ReviewData) error
 		return fmt.Errorf("failed to exec c.httpClient.Send(): %w", err)
 	}
 
-	if res.StatusCode != 201 {
+	if res.StatusCode != 200 {
 		slog.Error("Failed to post comment.", "req", fmt.Sprintf("URL: %s, Request body: %+v", parsedURL.String(), data), "res", fmt.Sprintf("%d: %s\n", res.StatusCode, string(res.Body)))
 		return fmt.Errorf("failed to post comment")
 	}
