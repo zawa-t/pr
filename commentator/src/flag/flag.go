@@ -10,7 +10,20 @@ import (
 	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
-var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role-name=[role name]"
+var usage = `
+Usage: commentator [options]
+
+Required Flags:
+	-n, --tool-name         	  Specify the tool name for static code analysis.
+	-f, --input-format      	  Specify the input format (default: text).
+	-r, --role-name         	  Specify the role name.
+
+Optional Flags:
+	-cus, --custom-message-format Specify the custom message format (json input only).
+	-alt, --alternative-text 	  Specify the alternative text.
+	-t, --format-type        	  Specify the format type (required for json input).
+	-efm                     	  Specify the error format (required for text input).
+`
 
 type useableFlag struct {
 	toolName            string
@@ -73,31 +86,35 @@ func (f *useableFlag) validate() {
 
 	allowedInputFormats := []string{format.Text, format.JSON}
 	if !slices.Contains(allowedInputFormats, f.inputFormat) {
-		slog.Error("The specified input-format is not supported.", "input-format", f.inputFormat)
+		slog.Error("Invalid configuration: The specified input-format is not supported.", "input-format", f.inputFormat)
 		os.Exit(1)
 	}
 
 	if f.inputFormat == format.Text && f.errorFormat == "" {
-		slog.Error("If the input-format flag is text, efm flag must be specified.")
+		slog.Error("Invalid configuration: When the input-format flag is `text`, the `efm` flag must be specified.")
 		os.Exit(1)
 	}
 
 	if f.inputFormat == format.JSON {
 		if f.formatType == "" {
-			slog.Error("If the input-format flag is json, format-type flag must be specified.")
+			slog.Error("Invalid configuration: When the input-format flag is json, format-type flag must be specified.")
 			os.Exit(1)
 		}
 
 		allowedFormatTypes := []string{"golangci-lint"}
 		if !slices.Contains(allowedFormatTypes, f.formatType) {
-			slog.Error("The specified format-type is not supported.", "format-type", f.formatType)
+			slog.Error("Invalid configuration: The specified format-type is not supported.", "format-type", f.formatType)
 			os.Exit(1)
 		}
 	}
 
 	_, ok := role.NameList[f.roleName]
 	if !ok {
-		slog.Error("The specified role is not supported.", "role", f.roleName)
+		useableRoleNames := make([]string, 0, len(role.NameList))
+		for roleName := range role.NameList {
+			useableRoleNames = append(useableRoleNames, roleName)
+		}
+		slog.Error("Invalid configuration: The specified role is not supported.", "role", f.roleName, "useableRoleNames", useableRoleNames)
 		os.Exit(1)
 	}
 }
@@ -117,7 +134,7 @@ func (v *Value) addOptionalValue(customMessageFormat, alternativeText, errorForm
 		if v.InputFormat == format.JSON { // NOTE: customMessageFormat は json 形式の場合のみ利用可能
 			v.CustomMessageFormat = &customMessageFormat
 		} else {
-			slog.Warn("If input-format flag is not in json format, customMessageFormat cannot be used.")
+			slog.Warn("When input-format flag is not in json format, customMessageFormat cannot be used.")
 		}
 	}
 

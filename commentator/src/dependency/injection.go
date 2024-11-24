@@ -11,8 +11,8 @@ import (
 	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
-func NewReporter(roleName int) (reporter report.Reporter) {
-	switch roleName {
+func NewReporter(roleNum int) (reporter report.Reporter) {
+	switch roleNum {
 	case role.LocalComment:
 		reporter = role.NewLocalCommentator()
 	case role.BitbucketPRComment:

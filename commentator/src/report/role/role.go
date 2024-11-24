@@ -6,6 +6,7 @@ const (
 	GithubPRComment
 	// GithubPRCheck
 	GithubCheck
+	maxRole = iota // MEMO: 定義している定数の数を計測するための定数（iotaは「最後の定数の次に設定されている値」という点を明示するため設定）
 )
 
 var NameList = map[string]int{
