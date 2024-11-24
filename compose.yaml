@@ -1,13 +1,13 @@
 services:
-  pr-commentator:
+  pr-reporter:
     build:
       context: ./
-      dockerfile: Dockerfile.commentator
-    image: commentator-img
-    container_name: commentator
+      dockerfile: Dockerfile.reporter
+    image: reporter-img
+    container_name: reporter
     volumes:
-      - ./commentator:/go/app
+      - ./reporter:/go/app
     env_file:
-      - ./commentator/.env
+      - ./reporter/.env
     tty: true
     stdin_open: true
