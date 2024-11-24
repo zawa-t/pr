@@ -42,7 +42,7 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 			// RawDetails:      "",
 			Path:      content.FilePath,
 			StartLine: int(content.LineNum),
-			// EndLine:         int(content.LineNum) + 1,
+			EndLine:   int(content.LineNum),
 		}
 	}
 	postheckRuns.Output.Annotations = annotations
