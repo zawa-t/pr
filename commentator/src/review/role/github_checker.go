@@ -2,6 +2,7 @@ package role
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
@@ -26,22 +27,22 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 		Status:     "completed",
 		Conclusion: "failure",
 		Output: github.CheckRunsOutput{
-			Title:   "Title",
-			Summary: "Summary",
-			Text:    "xxxxxxxxxxx",
+			Title:   fmt.Sprintf("[%s] some issues were reported", input.Name),
+			Summary: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
+			// Text: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
 		},
 	}
 
 	annotations := make([]github.Annotation, len(input.Contents))
 	for i, content := range input.Contents {
 		annotations[i] = github.Annotation{
-			Path:            content.FilePath,
-			StartLine:       int(content.LineNum),
-			EndLine:         int(content.LineNum) + 1,
 			AnnotationLevel: "warning",
+			Title:           fmt.Sprintf("reported by [%s]", content.Linter),
 			Message:         content.Message.String(),
-			Title:           content.Linter,
 			// RawDetails:      "",
+			Path:      content.FilePath,
+			StartLine: int(content.LineNum),
+			// EndLine:         int(content.LineNum) + 1,
 		}
 	}
 	postheckRuns.Output.Annotations = annotations
