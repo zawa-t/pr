@@ -10,12 +10,12 @@ import (
 	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
-var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role=[role name] < inputfile"
+var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role-name=[role name]"
 
 type useableFlag struct {
 	toolName         string
 	inputFormat      string
-	role             string
+	roleName         string
 	customTextFormat string
 	alternativeText  string
 	formatType       string
@@ -36,9 +36,9 @@ func newUseableFlag() *useableFlag {
 		flag.StringVar(&useableFlag.inputFormat, f, "text", "input format. The flag is required. json, text")
 	}
 
-	roleFlags := []string{"r", "role"}
+	roleFlags := []string{"r", "role-name"}
 	for _, f := range roleFlags {
-		flag.StringVar(&useableFlag.role, f, "", "The flag is required.")
+		flag.StringVar(&useableFlag.roleName, f, "", "The flag is required.")
 	}
 
 	// Optional
@@ -66,7 +66,7 @@ func newUseableFlag() *useableFlag {
 }
 
 func (f *useableFlag) validate() {
-	if f.toolName == "" || f.inputFormat == "" || f.role == "" {
+	if f.toolName == "" || f.inputFormat == "" || f.roleName == "" {
 		slog.Error(usage)
 		os.Exit(1)
 	}
@@ -95,9 +95,9 @@ func (f *useableFlag) validate() {
 		}
 	}
 
-	_, ok := role.NameList[f.role]
+	_, ok := role.NameList[f.roleName]
 	if !ok {
-		slog.Error("The specified role is not supported.", "role", f.role)
+		slog.Error("The specified role is not supported.", "role", f.roleName)
 		os.Exit(1)
 	}
 }
@@ -123,7 +123,7 @@ func NewValue() (value *Value) {
 		Required: Required{
 			ToolName:    useableFlag.toolName,
 			InputFormat: useableFlag.inputFormat,
-			Role:        role.NameList[useableFlag.role],
+			Role:        role.NameList[useableFlag.roleName],
 		},
 	}
 
