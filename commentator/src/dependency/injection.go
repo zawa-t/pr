@@ -16,7 +16,6 @@ func NewReporter(roleName int) (reporter report.Reporter) {
 	case role.LocalComment:
 		reporter = role.NewLocalCommentator()
 	case role.BitbucketPRComment:
-
 		reporter = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
 	case role.GithubPRComment:
 		reporter = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
