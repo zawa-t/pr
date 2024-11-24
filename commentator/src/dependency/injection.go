@@ -19,8 +19,8 @@ func NewReporter(roleName int) (reporter report.Reporter) {
 		reporter = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
 	case role.GithubPRComment:
 		reporter = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
-	case role.GithubPRCheck:
-		reporter = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
+	// case role.GithubPRCheck:
+	// 	reporter = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
 	case role.GithubCheck:
 		reporter = role.NewGithubChecker(githubClient.NewCustomClient(http.NewClient()))
 	default:
