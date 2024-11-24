@@ -102,50 +102,48 @@ func (f *useableFlag) validate() {
 	}
 }
 
-type Required struct {
-	ToolName, InputFormat string
-	Role                  int
-}
-
 type Optional struct {
 	CustomTextFormat, AlternativeText, ErrorFormat, FormatType *string
 }
 
 type Value struct {
-	Required
+	ToolName, InputFormat string
+	Role                  int
 	Optional
+}
+
+func (v *Value) addOptionalValue(customTextFormat, alternativeText, errorFormat, formatType string) {
+	if customTextFormat != "" {
+		if v.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
+			v.CustomTextFormat = &customTextFormat
+		} else {
+			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
+		}
+	}
+
+	if alternativeText != "" {
+		v.AlternativeText = &alternativeText
+	}
+
+	if errorFormat != "" {
+		v.ErrorFormat = &errorFormat
+	}
+
+	if formatType != "" {
+		v.FormatType = &formatType
+	}
 }
 
 func NewValue() (value *Value) {
 	useableFlag := newUseableFlag()
 
 	value = &Value{
-		Required: Required{
-			ToolName:    useableFlag.toolName,
-			InputFormat: useableFlag.inputFormat,
-			Role:        role.NameList[useableFlag.roleName],
-		},
+		ToolName:    useableFlag.toolName,
+		InputFormat: useableFlag.inputFormat,
+		Role:        role.NameList[useableFlag.roleName],
 	}
 
-	if useableFlag.customTextFormat != "" {
-		if value.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
-			value.CustomTextFormat = &useableFlag.customTextFormat
-		} else {
-			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
-		}
-	}
-
-	if useableFlag.alternativeText != "" {
-		value.AlternativeText = &useableFlag.alternativeText
-	}
-
-	if useableFlag.errorFormat != "" {
-		value.ErrorFormat = &useableFlag.errorFormat
-	}
-
-	if useableFlag.formatType != "" {
-		value.FormatType = &useableFlag.formatType
-	}
+	value.addOptionalValue(useableFlag.customTextFormat, useableFlag.alternativeText, useableFlag.errorFormat, useableFlag.formatType)
 
 	return
 }

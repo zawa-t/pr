@@ -6,7 +6,6 @@ import (
 
 	"github.com/zawa-t/pr/commentator/src/errors"
 	golangcilint "github.com/zawa-t/pr/commentator/src/format/json/golangci-lint"
-
 	"github.com/zawa-t/pr/commentator/src/report"
 )
 

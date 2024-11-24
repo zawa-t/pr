@@ -6,15 +6,12 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/zawa-t/pr/commentator/src/dependency"
 	"github.com/zawa-t/pr/commentator/src/flag"
 	"github.com/zawa-t/pr/commentator/src/format"
 	"github.com/zawa-t/pr/commentator/src/format/json"
 	"github.com/zawa-t/pr/commentator/src/format/text"
-	bitbucketClient "github.com/zawa-t/pr/commentator/src/platform/bitbucket/client"
-	githubClient "github.com/zawa-t/pr/commentator/src/platform/github/client"
-	"github.com/zawa-t/pr/commentator/src/platform/http"
 	"github.com/zawa-t/pr/commentator/src/report"
-	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
 /*
@@ -49,8 +46,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// MEMO:
-	// stat.Mode()を実行することでファイルのモード情報（ファイルの種類やアクセス権）を取得。それによって設定される os.ModeCharDevice の値を用いて、
+	// MEMO: stat.Mode()を実行することでファイルのモード情報（ファイルの種類やアクセス権）を取得。それによって設定される os.ModeCharDevice の値を用いて、
 	// 入力がキャラクタデバイス（通常、ターミナル）であるか否かを確認。現時点では、標準入力がパイプやリダイレクトのみ受け付けたいため、ターミナルからの入力の場合（0 でない場合）は処理終了。
 	if (stat.Mode() & os.ModeCharDevice) != 0 {
 		slog.Error("Only data from standard input can be accepted.")
@@ -63,7 +59,7 @@ func main() {
 	if len(data.Contents) == 0 {
 		slog.Info("No comments were added. This is because there is no data to comment on.")
 	} else {
-		if err := newReporter(flagValue.Role).Report(context.Background(), data); err != nil {
+		if err := dependency.NewReporter(flagValue.Role).Report(context.Background(), data); err != nil {
 			slog.Error("Failed to add comments.", "error", err.Error())
 			os.Exit(1)
 		}
@@ -105,23 +101,4 @@ func newData(flagValue flag.Value, stdin io.Reader) report.Data {
 		os.Exit(1)
 	}
 	return data
-}
-
-func newReporter(roleName int) (reporter report.Reporter) {
-	switch roleName {
-	case role.LocalComment:
-		reporter = role.NewLocalCommentator()
-	case role.BitbucketPRComment:
-		reporter = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
-	case role.GithubPRComment:
-		reporter = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
-	case role.GithubPRCheck:
-		reporter = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
-	case role.GithubCheck:
-		reporter = role.NewGithubChecker(githubClient.NewCustomClient(http.NewClient()))
-	default:
-		slog.Error("Unsupported role was set.")
-		os.Exit(1)
-	}
-	return
 }

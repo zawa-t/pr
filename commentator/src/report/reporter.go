@@ -27,6 +27,14 @@ func (m Message) String() string {
 	return string(m)
 }
 
+func DefaultMessage(filePath string, lineNum uint, linter string, text string) Message {
+	return Message(fmt.Sprintf("[Automatic Comment]  \n・File: %s（%d）  \n・Linter: %s  \n・Details: %s", filePath, lineNum, linter, text)) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
+}
+
+func CustomMessage(customText string) Message {
+	return Message(fmt.Sprintf("[Automatic Comment]  \n%s", customText))
+}
+
 // Data ...
 type Data struct {
 	Name     string
@@ -43,12 +51,4 @@ type Content struct {
 	CodeLine  string
 	Indicator string
 	Message   Message
-}
-
-func DefaultMessage(filePath string, lineNum uint, linter string, text string) Message {
-	return Message(fmt.Sprintf("[Automatic Comment]  \n・File: %s（%d）  \n・Linter: %s  \n・Details: %s", filePath, lineNum, linter, text)) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
-}
-
-func CustomMessage(customText string) Message {
-	return Message(fmt.Sprintf("[Automatic Comment]  \n%s", customText))
 }

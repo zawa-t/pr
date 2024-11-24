@@ -8,11 +8,15 @@ import (
 
 type env string
 
+var Env env = env(os.Getenv("ENV"))
+
 func (e env) IsLocal() bool {
 	return e == "local"
 }
 
-var Env env = env(os.Getenv("ENV"))
+func (e env) IsTest() bool {
+	return e == "test"
+}
 
 func getEnv(name string) string {
 	v := os.Getenv(name)
