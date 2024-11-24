@@ -96,13 +96,31 @@ func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input repor
 }
 
 func (b *bitbucketPRCommentator) addComments(ctx context.Context, input report.Data) error {
+	comments, err := b.newCommentData(ctx, input)
+	if err != nil {
+		return fmt.Errorf("failed to newCommentData(): %w", err)
+	}
+
+	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	for _, comment := range comments {
+		if err := b.client.PostComment(ctx, comment); err != nil {
+			multiErr = stdErr.Join(multiErr, err)
+		}
+	}
+	if multiErr != nil {
+		return multiErr
+	}
+	return nil
+}
+
+func (b *bitbucketPRCommentator) newCommentData(ctx context.Context, input report.Data) ([]bitbucket.CommentData, error) {
 	if len(input.Contents) == 0 {
-		return fmt.Errorf("there is no data to comment")
+		return nil, fmt.Errorf("there is no data to comment")
 	}
 
 	existingComments, err := b.client.GetComments(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to exec r.getComments(): %w", err)
+		return nil, fmt.Errorf("failed to GetComments(): %w", err)
 	}
 
 	existingCommentIDs := make([]report.ID, 0)
@@ -126,15 +144,5 @@ func (b *bitbucketPRCommentator) addComments(ctx context.Context, input report.D
 			})
 		}
 	}
-
-	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
-	for _, comment := range comments {
-		if err := b.client.PostComment(ctx, comment); err != nil {
-			multiErr = stdErr.Join(multiErr, err)
-		}
-	}
-	if multiErr != nil {
-		return multiErr
-	}
-	return nil
+	return comments, nil
 }
