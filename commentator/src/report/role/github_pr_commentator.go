@@ -8,7 +8,7 @@ import (
 
 	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 // githubPRCommentator ...
@@ -21,8 +21,8 @@ func NewGithubPRCommentator(c github.Client) *githubPRCommentator {
 	return &githubPRCommentator{c}
 }
 
-// Review ...
-func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) error {
+// Report ...
+func (g *githubPRCommentator) Report(ctx context.Context, input report.Data) error {
 	if len(input.Contents) == 0 {
 		return fmt.Errorf("there is no data to comment")
 	}
@@ -32,9 +32,9 @@ func (g *githubPRCommentator) Review(ctx context.Context, input review.Data) err
 		return fmt.Errorf("failed to exec r.GetPRComments(): %w", err)
 	}
 
-	existingCommentIDs := make([]review.ID, 0)
+	existingCommentIDs := make([]report.ID, 0)
 	for _, v := range existingComments {
-		existingCommentIDs = append(existingCommentIDs, review.ReNewID(v.Path, uint(v.StartLine), v.Body))
+		existingCommentIDs = append(existingCommentIDs, report.ReNewID(v.Path, uint(v.StartLine), v.Body))
 	}
 
 	comments := make([]github.CommentData, 0)

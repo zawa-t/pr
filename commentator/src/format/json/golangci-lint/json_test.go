@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	golangcilint "github.com/zawa-t/pr/commentator/src/format/json/golangci-lint"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 	"github.com/zawa-t/pr/commentator/src/test/helper"
 )
 
@@ -139,7 +139,7 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 		type testCase struct {
 			name     string
 			input    input
-			expected []review.Content
+			expected []report.Content
 		}
 
 		tests := []testCase{
@@ -163,14 +163,14 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 						},
 					},
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "linter", "something text")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "linter", "something text")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   review.DefaultMessage("example.go", 10, "linter", "something text"),
+						Message:   report.DefaultMessage("example.go", 10, "linter", "something text"),
 					},
 				},
 			},
@@ -195,14 +195,14 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 						},
 					},
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "linter", "alternativeText")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "linter", "alternativeText")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   review.DefaultMessage("example.go", 10, "linter", "alternativeText"),
+						Message:   report.DefaultMessage("example.go", 10, "linter", "alternativeText"),
 					},
 				},
 			},
@@ -227,14 +227,14 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 						},
 					},
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.CustomMessage("customTextFormat")),
+						ID:        report.NewID("example.go", 10, report.CustomMessage("customTextFormat")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   review.CustomMessage("customTextFormat"),
+						Message:   report.CustomMessage("customTextFormat"),
 					},
 				},
 			},
@@ -259,14 +259,14 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 						},
 					},
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.CustomMessage("example.go")),
+						ID:        report.NewID("example.go", 10, report.CustomMessage("example.go")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   review.CustomMessage("example.go"),
+						Message:   report.CustomMessage("example.go"),
 					},
 				},
 			},
@@ -292,14 +292,14 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 						},
 					},
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.CustomMessage("example.go")),
+						ID:        report.NewID("example.go", 10, report.CustomMessage("example.go")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   review.CustomMessage("example.go"),
+						Message:   report.CustomMessage("example.go"),
 					},
 				},
 			},

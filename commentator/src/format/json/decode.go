@@ -7,7 +7,7 @@ import (
 	"github.com/zawa-t/pr/commentator/src/errors"
 	golangcilint "github.com/zawa-t/pr/commentator/src/format/json/golangci-lint"
 
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 type Config struct {
@@ -29,7 +29,7 @@ func NewConfig(toolName string, formatType *string, customTextFormat, alternativ
 	}, nil
 }
 
-func Decode(stdin io.Reader, config Config) (contents []review.Content, err error) {
+func Decode(stdin io.Reader, config Config) (contents []report.Content, err error) {
 	switch config.FormatType {
 	case "golangci-lint":
 		jsonData, err := golangcilint.Decode(stdin)

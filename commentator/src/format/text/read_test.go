@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zawa-t/pr/commentator/src/format/text"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 	"github.com/zawa-t/pr/commentator/src/test/helper"
 )
 
@@ -127,7 +127,7 @@ func Test_Read(t *testing.T) {
 	type testCase struct {
 		name     string
 		input    input
-		expected []review.Content
+		expected []report.Content
 	}
 
 	testExecutor := func(tests []testCase) {
@@ -143,7 +143,7 @@ func Test_Read(t *testing.T) {
 		}
 	}
 
-	t.Run("正常系 - 指定されたエラーフォーマットと一致するテキストがあった場合、その内容を反映させた[]review.Content型のスライスを返す", func(t *testing.T) {
+	t.Run("正常系 - 指定されたエラーフォーマットと一致するテキストがあった場合、その内容を反映させた[]report.Content型のスライスを返す", func(t *testing.T) {
 		tests := []testCase{
 			{
 				name: "エラーフォーマットが `%f:%l:%c: %m` の場合",
@@ -153,26 +153,26 @@ func Test_Read(t *testing.T) {
 example.go:20:6: Another error
 `,
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
 						CodeLine:  "",
 						Indicator: "",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
+						Message:   report.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
 					},
 					{
-						ID:        review.NewID("example.go", 20, review.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
+						ID:        report.NewID("example.go", 20, report.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
 						FilePath:  "example.go",
 						LineNum:   20,
 						ColumnNum: 6,
 						CodeLine:  "",
 						Indicator: "",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
+						Message:   report.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
 					},
 				},
 			},
@@ -184,26 +184,26 @@ example.go:20:6: Another error
 example.go:20:6: Another error
 `,
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "TestLinter", "AlternativeText")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "TestLinter", "AlternativeText")),
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
 						CodeLine:  "",
 						Indicator: "",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 10, "TestLinter", "AlternativeText"),
+						Message:   report.DefaultMessage("example.go", 10, "TestLinter", "AlternativeText"),
 					},
 					{
-						ID:        review.NewID("example.go", 20, review.DefaultMessage("example.go", 20, "TestLinter", "AlternativeText")),
+						ID:        report.NewID("example.go", 20, report.DefaultMessage("example.go", 20, "TestLinter", "AlternativeText")),
 						FilePath:  "example.go",
 						LineNum:   20,
 						ColumnNum: 6,
 						CodeLine:  "",
 						Indicator: "",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 20, "TestLinter", "AlternativeText"),
+						Message:   report.DefaultMessage("example.go", 20, "TestLinter", "AlternativeText"),
 					},
 				},
 			},
@@ -219,26 +219,26 @@ var b = 20
         ^
 `,
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
 						CodeLine:  "var a = 10",
 						Indicator: "        ^",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
+						Message:   report.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
 					},
 					{
-						ID:        review.NewID("example.go", 20, review.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
+						ID:        report.NewID("example.go", 20, report.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
 						FilePath:  "example.go",
 						LineNum:   20,
 						ColumnNum: 6,
 						CodeLine:  "var b = 20",
 						Indicator: "        ^",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
+						Message:   report.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
 					},
 				},
 			},
@@ -254,26 +254,26 @@ var b = 20
         ^
 `,
 				},
-				expected: []review.Content{
+				expected: []report.Content{
 					{
-						ID:        review.NewID("example.go", 10, review.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
+						ID:        report.NewID("example.go", 10, report.DefaultMessage("example.go", 10, "TestLinter", "Error message here")),
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 0,
 						CodeLine:  "var a = 10",
 						Indicator: "        ^",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
+						Message:   report.DefaultMessage("example.go", 10, "TestLinter", "Error message here"),
 					},
 					{
-						ID:        review.NewID("example.go", 20, review.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
+						ID:        report.NewID("example.go", 20, report.DefaultMessage("example.go", 20, "TestLinter", "Another error")),
 						FilePath:  "example.go",
 						LineNum:   20,
 						ColumnNum: 0,
 						CodeLine:  "var b = 20",
 						Indicator: "        ^",
 						Linter:    "TestLinter",
-						Message:   review.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
+						Message:   report.DefaultMessage("example.go", 20, "TestLinter", "Another error"),
 					},
 				},
 			},
@@ -283,7 +283,7 @@ var b = 20
 		testExecutor(tests)
 	})
 
-	t.Run("正常系 - 正規表現にマッチするテキストがない場合、空のスライス（[]review.Content{}）を返す", func(t *testing.T) {
+	t.Run("正常系 - 正規表現にマッチするテキストがない場合、空のスライス（[]report.Content{}）を返す", func(t *testing.T) {
 		tests := []testCase{
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致しているものの、%fにあたる部分がファイルパス形式（yyy.拡張子）ではない場合",
@@ -291,7 +291,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `example:10:5: Error message here`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致しているものの、%lにあたる部分が数値ではない場合",
@@ -299,7 +299,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `example.go:xxxx:5: Error message here`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致しているものの、%cにあたる部分が数値ではない場合",
@@ -307,7 +307,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `example.go:10:xxxx: Error message here`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致していない場合",
@@ -315,7 +315,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `xxxx`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致していない場合（指定した%fにあたる部分がない）",
@@ -323,7 +323,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `10:5: Error message here`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致していない場合（指定した%lまたは%cにあたる部分が両方ない）",
@@ -331,7 +331,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `example.go:5: Error message here`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 			{
 				name: "テキストの内容がエラーフォーマットの形式と一致していない場合（指定した%mにあたる部分がない）",
@@ -339,7 +339,7 @@ var b = 20
 					config: NewConfigWithNoError("TestLinter", "%f:%l:%c: %m", nil),
 					text:   `example.go:10:5`,
 				},
-				expected: []review.Content{},
+				expected: []report.Content{},
 			},
 		}
 		testExecutor(tests)

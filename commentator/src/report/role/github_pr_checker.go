@@ -6,7 +6,7 @@ import (
 
 	"github.com/zawa-t/pr/commentator/src/env"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 // githubPRChecker ...
@@ -19,8 +19,8 @@ func NewGithubPRChecker(c github.Client) *githubPRChecker {
 	return &githubPRChecker{c}
 }
 
-// Review ...
-func (g *githubPRChecker) Review(ctx context.Context, input review.Data) error {
+// Report ...
+func (g *githubPRChecker) Report(ctx context.Context, input report.Data) error {
 	postheckRuns := github.POSTCheckRuns{
 		Name:       input.Name,
 		HeadSHA:    env.Github.CommitID,

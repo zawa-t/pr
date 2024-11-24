@@ -7,13 +7,104 @@ import (
 	"slices"
 
 	"github.com/zawa-t/pr/commentator/src/format"
-	"github.com/zawa-t/pr/commentator/src/review/role"
+	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
 var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role=[role name] < inputfile"
 
+type useableFlag struct {
+	toolName         string
+	inputFormat      string
+	role             string
+	customTextFormat string
+	alternativeText  string
+	formatType       string
+	errorFormat      string
+}
+
+func newUseableFlag() *useableFlag {
+	useableFlag := new(useableFlag)
+
+	// Required
+	toolNameFlags := []string{"n", "tool-name"}
+	for _, f := range toolNameFlags {
+		flag.StringVar(&useableFlag.toolName, f, "", "The tool name for static code analysis. The flag is required.")
+	}
+
+	inputFormatFlags := []string{"f", "input-format"}
+	for _, f := range inputFormatFlags {
+		flag.StringVar(&useableFlag.inputFormat, f, "text", "input format. The flag is required. json, text")
+	}
+
+	roleFlags := []string{"r", "role"}
+	for _, f := range roleFlags {
+		flag.StringVar(&useableFlag.role, f, "", "The flag is required.")
+	}
+
+	// Optional
+	customTextFormatFlags := []string{"cus", "custom-text-format"}
+	for _, f := range customTextFormatFlags {
+		flag.StringVar(&useableFlag.customTextFormat, f, "", "The flag is optional. input-format が json の場合にのみ使用可能")
+	}
+
+	alternativeTextFlags := []string{"alt", "alternative-text"}
+	for _, f := range alternativeTextFlags {
+		flag.StringVar(&useableFlag.alternativeText, f, "", "The flag is optional.")
+	}
+
+	formatTypeFlags := []string{"t", "format-type"}
+	for _, f := range formatTypeFlags {
+		flag.StringVar(&useableFlag.formatType, f, "", "format type. The flag is optional. input-format が json の場合は必須。 golangci-lint")
+	}
+
+	flag.StringVar(&useableFlag.errorFormat, "efm", "", "Error format pattern. input-format が text の場合にのみ使用可能。%f:%l:%c: %m")
+
+	flag.Parse()
+
+	useableFlag.validate()
+	return useableFlag
+}
+
+func (f *useableFlag) validate() {
+	if f.toolName == "" || f.inputFormat == "" || f.role == "" {
+		slog.Error(usage)
+		os.Exit(1)
+	}
+
+	allowedInputFormats := []string{format.Text, format.JSON}
+	if !slices.Contains(allowedInputFormats, f.inputFormat) {
+		slog.Error("The specified input-format is not supported.", "input-format", f.inputFormat)
+		os.Exit(1)
+	}
+
+	if f.inputFormat == format.Text && f.errorFormat == "" {
+		slog.Error("If the input-format flag is text, efm flag must be specified.")
+		os.Exit(1)
+	}
+
+	if f.inputFormat == format.JSON {
+		if f.formatType == "" {
+			slog.Error("If the input-format flag is json, format-type flag must be specified.")
+			os.Exit(1)
+		}
+
+		allowedFormatTypes := []string{"golangci-lint"}
+		if !slices.Contains(allowedFormatTypes, f.formatType) {
+			slog.Error("The specified format-type is not supported.", "format-type", f.formatType)
+			os.Exit(1)
+		}
+	}
+
+	_, ok := role.NameList[f.role]
+	if !ok {
+		slog.Error("The specified role is not supported.", "role", f.role)
+		os.Exit(1)
+	}
+}
+
 type Required struct {
-	ToolName, InputFormat, Role string
+	ToolName, InputFormat string
+	Role                  int
 }
 
 type Optional struct {
@@ -26,114 +117,35 @@ type Value struct {
 }
 
 func NewValue() (value *Value) {
-	// Required
-	var toolName string
-	toolNameFlags := []string{"n", "tool-name"}
-	for _, f := range toolNameFlags {
-		flag.StringVar(&toolName, f, "", "The tool name for static code analysis. The flag is required.")
-	}
-
-	var inputFormat string
-	inputFormatFlags := []string{"f", "input-format"}
-	for _, f := range inputFormatFlags {
-		flag.StringVar(&inputFormat, f, "text", "input format. The flag is required. json, text")
-	}
-
-	var role string
-	roleFlags := []string{"r", "role"}
-	for _, f := range roleFlags {
-		flag.StringVar(&role, f, "", "The flag is required.")
-	}
-
-	// Optional
-	var customTextFormat string
-	customTextFormatFlags := []string{"cus", "custom-text-format"}
-	for _, f := range customTextFormatFlags {
-		flag.StringVar(&customTextFormat, f, "", "The flag is optional. input-format が json の場合にのみ使用可能")
-	}
-
-	var alternativeText string
-	alternativeTextFlags := []string{"alt", "alternative-text"}
-	for _, f := range alternativeTextFlags {
-		flag.StringVar(&alternativeText, f, "", "The flag is optional.")
-	}
-
-	var formatType string
-	formatTypeFlags := []string{"t", "format-type"}
-	for _, f := range formatTypeFlags {
-		flag.StringVar(&formatType, f, "", "format type. The flag is optional. input-format が json の場合は必須。 golangci-lint")
-	}
-
-	var errorFormat string
-	flag.StringVar(&errorFormat, "efm", "", "Error format pattern. input-format が text の場合にのみ使用可能。%f:%l:%c: %m")
-
-	flag.Parse()
+	useableFlag := newUseableFlag()
 
 	value = &Value{
 		Required: Required{
-			ToolName:    toolName,
-			InputFormat: inputFormat,
-			Role:        role,
+			ToolName:    useableFlag.toolName,
+			InputFormat: useableFlag.inputFormat,
+			Role:        role.NameList[useableFlag.role],
 		},
 	}
 
-	if customTextFormat != "" {
+	if useableFlag.customTextFormat != "" {
 		if value.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
-			value.CustomTextFormat = &customTextFormat
+			value.CustomTextFormat = &useableFlag.customTextFormat
 		} else {
 			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
 		}
 	}
 
-	if alternativeText != "" {
-		value.AlternativeText = &alternativeText
+	if useableFlag.alternativeText != "" {
+		value.AlternativeText = &useableFlag.alternativeText
 	}
 
-	if errorFormat != "" {
-		value.ErrorFormat = &errorFormat
+	if useableFlag.errorFormat != "" {
+		value.ErrorFormat = &useableFlag.errorFormat
 	}
 
-	if formatType != "" {
-		value.FormatType = &formatType
+	if useableFlag.formatType != "" {
+		value.FormatType = &useableFlag.formatType
 	}
 
-	value.validate()
 	return
-}
-
-func (v *Value) validate() {
-	if v.ToolName == "" || v.InputFormat == "" || v.Role == "" {
-		slog.Error(usage)
-		os.Exit(1)
-	}
-
-	allowedInputFormats := []string{format.Text, format.JSON}
-	if !slices.Contains(allowedInputFormats, v.InputFormat) {
-		slog.Error("The specified input-format is not supported.", "input-format", v.InputFormat)
-		os.Exit(1)
-	}
-
-	if v.InputFormat == format.Text && v.ErrorFormat == nil {
-		slog.Error("If the input-format flag is text, efm flag must be specified.")
-		os.Exit(1)
-	}
-
-	if v.InputFormat == format.JSON {
-		if v.FormatType == nil {
-			slog.Error("If the input-format flag is json, format-type flag must be specified.")
-			os.Exit(1)
-		}
-
-		allowedFormatTypes := []string{"golangci-lint"}
-		if !slices.Contains(allowedFormatTypes, *v.FormatType) {
-			slog.Error("The specified format-type is not supported.", "format-type", *v.FormatType)
-			os.Exit(1)
-		}
-	}
-
-	allowedRoleNames := []string{role.LocalCommentator, role.BitbucketPRCommentator, role.GithubPRCommentator, role.GithubPRChecker, role.GithubChecker}
-	if !slices.Contains(allowedRoleNames, v.Role) {
-		slog.Error("The specified role is not supported.", "role", v.Role)
-		os.Exit(1)
-	}
 }

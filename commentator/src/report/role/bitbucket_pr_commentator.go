@@ -7,7 +7,7 @@ import (
 	"slices"
 
 	"github.com/zawa-t/pr/commentator/src/platform/bitbucket"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 // bitbucketPRCommentator ...
@@ -20,8 +20,8 @@ func NewBitbucketPRCommentator(c bitbucket.Client) *bitbucketPRCommentator {
 	return &bitbucketPRCommentator{c}
 }
 
-// Review ...
-func (b *bitbucketPRCommentator) Review(ctx context.Context, input review.Data) error {
+// Report ...
+func (b *bitbucketPRCommentator) Report(ctx context.Context, input report.Data) error {
 	reportID := fmt.Sprintf("pr-commentator-%s", input.Name)
 
 	if err := b.createReport(ctx, input, reportID); err != nil {
@@ -36,11 +36,10 @@ func (b *bitbucketPRCommentator) Review(ctx context.Context, input review.Data) 
 			return fmt.Errorf("failed to exec r.addComments(): %w", err)
 		}
 	}
-
 	return nil
 }
 
-func (b *bitbucketPRCommentator) createReport(ctx context.Context, input review.Data, reportID string) error {
+func (b *bitbucketPRCommentator) createReport(ctx context.Context, input report.Data, reportID string) error {
 	reportData := bitbucket.ReportData{
 		Title:      fmt.Sprintf("[%s] PR-Commentator report", input.Name),
 		Details:    "This report generated for you by pr-commentator.", // TODO: 内容については要検討
@@ -71,7 +70,7 @@ func (b *bitbucketPRCommentator) createReport(ctx context.Context, input review.
 	return nil
 }
 
-func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input review.Data, reportID string) error {
+func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input report.Data, reportID string) error {
 	if len(input.Contents) == 0 {
 		return fmt.Errorf("there is no data to annotation")
 	}
@@ -96,7 +95,7 @@ func (b *bitbucketPRCommentator) addAnnotations(ctx context.Context, input revie
 	return nil
 }
 
-func (b *bitbucketPRCommentator) addComments(ctx context.Context, input review.Data) error {
+func (b *bitbucketPRCommentator) addComments(ctx context.Context, input report.Data) error {
 	if len(input.Contents) == 0 {
 		return fmt.Errorf("there is no data to comment")
 	}
@@ -106,10 +105,10 @@ func (b *bitbucketPRCommentator) addComments(ctx context.Context, input review.D
 		return fmt.Errorf("failed to exec r.getComments(): %w", err)
 	}
 
-	existingCommentIDs := make([]review.ID, 0)
+	existingCommentIDs := make([]report.ID, 0)
 	for _, v := range existingComments {
 		if !v.Deleted {
-			existingCommentIDs = append(existingCommentIDs, review.ReNewID(v.Inline.Path, v.Inline.To, v.Content.Raw))
+			existingCommentIDs = append(existingCommentIDs, report.ReNewID(v.Inline.Path, v.Inline.To, v.Content.Raw))
 		}
 	}
 

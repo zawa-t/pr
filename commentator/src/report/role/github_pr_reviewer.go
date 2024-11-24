@@ -5,7 +5,7 @@ import (
 
 	"github.com/zawa-t/pr/commentator/src/log"
 	"github.com/zawa-t/pr/commentator/src/platform/github"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 // githubPRReviewer ...
@@ -18,8 +18,8 @@ func NewGithubPRReviewer(c github.Client) *githubPRReviewer {
 	return &githubPRReviewer{c}
 }
 
-// Review ...
-func (g *githubPRReviewer) Review(ctx context.Context, input review.Data) error {
+// Report ...
+func (g *githubPRReviewer) Report(ctx context.Context, input report.Data) error {
 	comments := make([]github.Comment, len(input.Contents))
 	for i, content := range input.Contents {
 		comments[i] = github.Comment{

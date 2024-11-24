@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/zawa-t/pr/commentator/src/errors"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 type efm string
@@ -58,16 +58,16 @@ func NewConfig(toolName string, errorFormat, alternativeText *string) (*Config, 
 }
 
 // efm パターンでファイルをパースして Issue を抽出する関数
-func Read(stdin io.Reader, config Config) ([]review.Content, error) {
+func Read(stdin io.Reader, config Config) ([]report.Content, error) {
 	regex, err := config.ErrorFormat.convertToRegex()
 	if err != nil {
 		return nil, err
 	}
 
-	var currentContent *review.Content
+	var currentContent *report.Content
 	lineCounter := 0
 
-	contents := make([]review.Content, 0)
+	contents := make([]report.Content, 0)
 	scanner := bufio.NewScanner(stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -79,7 +79,7 @@ func Read(stdin io.Reader, config Config) ([]review.Content, error) {
 			if currentContent != nil {
 				contents = append(contents, *currentContent)
 			}
-			currentContent = &review.Content{}
+			currentContent = &report.Content{}
 			lineCounter = 1
 
 			// キャプチャグループから Issue を生成
@@ -106,8 +106,8 @@ func Read(stdin io.Reader, config Config) ([]review.Content, error) {
 				}
 			}
 			currentContent.Linter = config.ToolName
-			currentContent.Message = review.DefaultMessage(currentContent.FilePath, currentContent.LineNum, currentContent.Linter, text)
-			currentContent.ID = review.NewID(currentContent.FilePath, currentContent.LineNum, currentContent.Message)
+			currentContent.Message = report.DefaultMessage(currentContent.FilePath, currentContent.LineNum, currentContent.Linter, text)
+			currentContent.ID = report.NewID(currentContent.FilePath, currentContent.LineNum, currentContent.Message)
 		} else if currentContent != nil && lineCounter == 1 {
 			// 2行目：該当コード行
 			currentContent.CodeLine = line

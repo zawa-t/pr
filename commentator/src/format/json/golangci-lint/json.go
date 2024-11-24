@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 type JSON struct {
@@ -40,10 +40,10 @@ func Decode(stdin io.Reader) (*JSON, error) {
 	return &jsonData, nil
 }
 
-func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]review.Content, error) {
-	contents := make([]review.Content, 0)
+func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]report.Content, error) {
+	contents := make([]report.Content, 0)
 	for _, v := range issues {
-		var message review.Message
+		var message report.Message
 		if customTextFormat != nil {
 			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat)
 			if err != nil {
@@ -55,7 +55,7 @@ func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]
 			if err != nil {
 				return nil, fmt.Errorf("failed to Execute(): %w", err)
 			}
-			message = review.CustomMessage(result.String())
+			message = report.CustomMessage(result.String())
 		} else {
 			var text string
 			if alternativeText != nil {
@@ -63,11 +63,11 @@ func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]
 			} else {
 				text = v.Text
 			}
-			message = review.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, text)
+			message = report.DefaultMessage(v.Pos.Filename, v.Pos.Line, v.FromLinter, text)
 		}
 
-		data := review.Content{
-			ID:        review.NewID(v.Pos.Filename, v.Pos.Line, message),
+		data := report.Content{
+			ID:        report.NewID(v.Pos.Filename, v.Pos.Line, message),
 			Linter:    v.FromLinter,
 			FilePath:  v.Pos.Filename,
 			LineNum:   v.Pos.Line,

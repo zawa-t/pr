@@ -13,8 +13,8 @@ import (
 	bitbucketClient "github.com/zawa-t/pr/commentator/src/platform/bitbucket/client"
 	githubClient "github.com/zawa-t/pr/commentator/src/platform/github/client"
 	"github.com/zawa-t/pr/commentator/src/platform/http"
-	"github.com/zawa-t/pr/commentator/src/review"
-	"github.com/zawa-t/pr/commentator/src/review/role"
+	"github.com/zawa-t/pr/commentator/src/report"
+	"github.com/zawa-t/pr/commentator/src/report/role"
 )
 
 /*
@@ -63,7 +63,7 @@ func main() {
 	if len(data.Contents) == 0 {
 		slog.Info("No comments were added. This is because there is no data to comment on.")
 	} else {
-		if err := newReviewer(flagValue.Role).Review(context.Background(), data); err != nil {
+		if err := newReporter(flagValue.Role).Report(context.Background(), data); err != nil {
 			slog.Error("Failed to add comments.", "error", err.Error())
 			os.Exit(1)
 		}
@@ -72,8 +72,8 @@ func main() {
 	}
 }
 
-func newData(flagValue flag.Value, stdin io.Reader) review.Data {
-	data := review.Data{
+func newData(flagValue flag.Value, stdin io.Reader) report.Data {
+	data := report.Data{
 		Name: flagValue.ToolName,
 	}
 
@@ -107,18 +107,18 @@ func newData(flagValue flag.Value, stdin io.Reader) review.Data {
 	return data
 }
 
-func newReviewer(roleName string) (reviewer review.Reviewer) {
+func newReporter(roleName int) (reporter report.Reporter) {
 	switch roleName {
-	case role.LocalCommentator:
-		reviewer = role.NewLocalCommentator()
-	case role.BitbucketPRCommentator:
-		reviewer = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
-	case role.GithubPRCommentator:
-		reviewer = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
-	case role.GithubPRChecker:
-		reviewer = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
-	case role.GithubChecker:
-		reviewer = role.NewGithubChecker(githubClient.NewCustomClient(http.NewClient()))
+	case role.LocalComment:
+		reporter = role.NewLocalCommentator()
+	case role.BitbucketPRComment:
+		reporter = role.NewBitbucketPRCommentator(bitbucketClient.NewCustomClient(http.NewClient()))
+	case role.GithubPRComment:
+		reporter = role.NewGithubPRCommentator(githubClient.NewCustomClient(http.NewClient()))
+	case role.GithubPRCheck:
+		reporter = role.NewGithubPRChecker(githubClient.NewCustomClient(http.NewClient()))
+	case role.GithubCheck:
+		reporter = role.NewGithubChecker(githubClient.NewCustomClient(http.NewClient()))
 	default:
 		slog.Error("Unsupported role was set.")
 		os.Exit(1)

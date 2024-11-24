@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zawa-t/pr/commentator/src/log"
-	"github.com/zawa-t/pr/commentator/src/review"
+	"github.com/zawa-t/pr/commentator/src/report"
 )
 
 // localCommentator ...
@@ -16,8 +16,8 @@ func NewLocalCommentator() *localCommentator {
 	return &localCommentator{}
 }
 
-// Review ...
-func (pr *localCommentator) Review(ctx context.Context, input review.Data) error {
-	log.PrintJSON("The following are the assumptions that will be submitted as review data.", input)
+// Report ...
+func (pr *localCommentator) Report(ctx context.Context, input report.Data) error {
+	log.PrintJSON("The following are the assumptions that will be submitted as report data.", input)
 	return nil
 }

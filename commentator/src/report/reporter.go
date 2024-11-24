@@ -1,14 +1,14 @@
-//go:generate moq -rm -out $GOPATH/app/src/test/mock/$GOFILE -pkg mock . Reviewer
-package review
+//go:generate moq -rm -out $GOPATH/app/src/test/mock/$GOFILE -pkg mock . Reporter
+package report
 
 import (
 	"context"
 	"fmt"
 )
 
-// Reviewer ...
-type Reviewer interface {
-	Review(ctx context.Context, data Data) error
+// Reporter ...
+type Reporter interface {
+	Report(ctx context.Context, data Data) error
 }
 
 type ID string
