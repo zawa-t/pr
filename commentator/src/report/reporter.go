@@ -31,8 +31,8 @@ func DefaultMessage(filePath string, lineNum uint, linter string, text string) M
 	return Message(fmt.Sprintf("[Automatic Comment]  \n・File: %s（%d）  \n・Linter: %s  \n・Details: %s", filePath, lineNum, linter, text)) // NOTE: 改行する際には、「空白2つ+`/n`（  \n）」が必要な点に注意
 }
 
-func CustomMessage(customText string) Message {
-	return Message(fmt.Sprintf("[Automatic Comment]  \n%s", customText))
+func CustomMessage(customMessageFormat string) Message {
+	return Message(fmt.Sprintf("[Automatic Comment]  \n%s", customMessageFormat))
 }
 
 // Data ...

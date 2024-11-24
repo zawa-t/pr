@@ -13,13 +13,13 @@ import (
 var usage = "Usage: commentator --tool-name=[tool name] --input-format=[input format] --role-name=[role name]"
 
 type useableFlag struct {
-	toolName         string
-	inputFormat      string
-	roleName         string
-	customTextFormat string
-	alternativeText  string
-	formatType       string
-	errorFormat      string
+	toolName            string
+	inputFormat         string
+	roleName            string
+	customMessageFormat string
+	alternativeText     string
+	formatType          string
+	errorFormat         string
 }
 
 func newUseableFlag() *useableFlag {
@@ -28,36 +28,36 @@ func newUseableFlag() *useableFlag {
 	// Required
 	toolNameFlags := []string{"n", "tool-name"}
 	for _, f := range toolNameFlags {
-		flag.StringVar(&useableFlag.toolName, f, "", "The tool name for static code analysis. The flag is required.")
+		flag.StringVar(&useableFlag.toolName, f, "", "Specify the tool name for static code analysis. The flag is required.")
 	}
 
 	inputFormatFlags := []string{"f", "input-format"}
 	for _, f := range inputFormatFlags {
-		flag.StringVar(&useableFlag.inputFormat, f, "text", "input format. The flag is required. json, text")
+		flag.StringVar(&useableFlag.inputFormat, f, "text", "Specify the input format. The flag is required (default value: text).")
 	}
 
 	roleFlags := []string{"r", "role-name"}
 	for _, f := range roleFlags {
-		flag.StringVar(&useableFlag.roleName, f, "", "The flag is required.")
+		flag.StringVar(&useableFlag.roleName, f, "", "Specify the role name. The flag is required.")
 	}
 
 	// Optional
-	customTextFormatFlags := []string{"cus", "custom-text-format"}
-	for _, f := range customTextFormatFlags {
-		flag.StringVar(&useableFlag.customTextFormat, f, "", "The flag is optional. input-format が json の場合にのみ使用可能")
+	customMessageFormatFlags := []string{"cus", "custom-message-format"}
+	for _, f := range customMessageFormatFlags {
+		flag.StringVar(&useableFlag.customMessageFormat, f, "", "Specify the custom message format. The flag is optional. This flag is only available when input-format is set to json.")
 	}
 
 	alternativeTextFlags := []string{"alt", "alternative-text"}
 	for _, f := range alternativeTextFlags {
-		flag.StringVar(&useableFlag.alternativeText, f, "", "The flag is optional.")
+		flag.StringVar(&useableFlag.alternativeText, f, "", "Specify the alternative text. The flag is optional.")
 	}
 
 	formatTypeFlags := []string{"t", "format-type"}
 	for _, f := range formatTypeFlags {
-		flag.StringVar(&useableFlag.formatType, f, "", "format type. The flag is optional. input-format が json の場合は必須。 golangci-lint")
+		flag.StringVar(&useableFlag.formatType, f, "", "Specify the format type. The flag is optional. This is required when input-format is set to json.")
 	}
 
-	flag.StringVar(&useableFlag.errorFormat, "efm", "", "Error format pattern. input-format が text の場合にのみ使用可能。%f:%l:%c: %m")
+	flag.StringVar(&useableFlag.errorFormat, "efm", "", "Specify the error format. This is required when input-format is set to text.")
 
 	flag.Parse()
 
@@ -103,7 +103,7 @@ func (f *useableFlag) validate() {
 }
 
 type Optional struct {
-	CustomTextFormat, AlternativeText, ErrorFormat, FormatType *string
+	CustomMessageFormat, AlternativeText, ErrorFormat, FormatType *string
 }
 
 type Value struct {
@@ -112,12 +112,12 @@ type Value struct {
 	Optional
 }
 
-func (v *Value) addOptionalValue(customTextFormat, alternativeText, errorFormat, formatType string) {
-	if customTextFormat != "" {
-		if v.InputFormat == format.JSON { // NOTE: customTextFormat は json 形式の場合のみ利用可能
-			v.CustomTextFormat = &customTextFormat
+func (v *Value) addOptionalValue(customMessageFormat, alternativeText, errorFormat, formatType string) {
+	if customMessageFormat != "" {
+		if v.InputFormat == format.JSON { // NOTE: customMessageFormat は json 形式の場合のみ利用可能
+			v.CustomMessageFormat = &customMessageFormat
 		} else {
-			slog.Warn("If input-format flag is not in json format, customTextFormat cannot be used.")
+			slog.Warn("If input-format flag is not in json format, customMessageFormat cannot be used.")
 		}
 	}
 
@@ -143,7 +143,7 @@ func NewValue() (value *Value) {
 		Role:        role.NameList[useableFlag.roleName],
 	}
 
-	value.addOptionalValue(useableFlag.customTextFormat, useableFlag.alternativeText, useableFlag.errorFormat, useableFlag.formatType)
+	value.addOptionalValue(useableFlag.customMessageFormat, useableFlag.alternativeText, useableFlag.errorFormat, useableFlag.formatType)
 
 	return
 }

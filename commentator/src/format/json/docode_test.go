@@ -11,10 +11,10 @@ import (
 func Test_json_NewConfig(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		type input struct {
-			toolName         string
-			formatType       *string
-			customTextFormat *string
-			alternativeText  *string
+			toolName            string
+			formatType          *string
+			customMessageFormat *string
+			alternativeText     *string
 		}
 		type testCase struct {
 			name     string
@@ -26,38 +26,38 @@ func Test_json_NewConfig(t *testing.T) {
 			{
 				name: "すべての引数に値がある",
 				input: input{
-					toolName:         "linter",
-					formatType:       helper.ToPtr("formatType"),
-					customTextFormat: helper.ToPtr("customTextFormat"),
-					alternativeText:  helper.ToPtr("alternativeText"),
+					toolName:            "linter",
+					formatType:          helper.ToPtr("formatType"),
+					customMessageFormat: helper.ToPtr("customMessageFormat"),
+					alternativeText:     helper.ToPtr("alternativeText"),
 				},
 				expected: &json.Config{
-					ToolName:         "linter",
-					FormatType:       "formatType",
-					CustomTextFormat: helper.ToPtr("customTextFormat"),
-					AlternativeText:  helper.ToPtr("alternativeText"),
+					ToolName:            "linter",
+					FormatType:          "formatType",
+					CustomMessageFormat: helper.ToPtr("customMessageFormat"),
+					AlternativeText:     helper.ToPtr("alternativeText"),
 				},
 			},
 			{
-				name: "customTextFormatおよびcustomTextFormatがnil",
+				name: "customMessageFormatおよびcalternativeTextがnil",
 				input: input{
-					toolName:         "linter",
-					formatType:       helper.ToPtr("formatType"),
-					customTextFormat: nil,
-					alternativeText:  nil,
+					toolName:            "linter",
+					formatType:          helper.ToPtr("formatType"),
+					customMessageFormat: nil,
+					alternativeText:     nil,
 				},
 				expected: &json.Config{
-					ToolName:         "linter",
-					FormatType:       "formatType",
-					CustomTextFormat: nil,
-					AlternativeText:  nil,
+					ToolName:            "linter",
+					FormatType:          "formatType",
+					CustomMessageFormat: nil,
+					AlternativeText:     nil,
 				},
 			},
 		}
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := json.NewConfig(tt.input.toolName, tt.input.formatType, tt.input.customTextFormat, tt.input.alternativeText)
+				got, err := json.NewConfig(tt.input.toolName, tt.input.formatType, tt.input.customMessageFormat, tt.input.alternativeText)
 				if assert.NoError(t, err) {
 					assert.Equal(t, tt.expected, got)
 				}
@@ -67,10 +67,10 @@ func Test_json_NewConfig(t *testing.T) {
 
 	t.Run("異常系", func(t *testing.T) {
 		type input struct {
-			toolName         string
-			formatType       *string
-			customTextFormat *string
-			alternativeText  *string
+			toolName            string
+			formatType          *string
+			customMessageFormat *string
+			alternativeText     *string
 		}
 		type testCase struct {
 			name  string
@@ -103,7 +103,7 @@ func Test_json_NewConfig(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := json.NewConfig(tt.input.toolName, tt.input.formatType, tt.input.customTextFormat, tt.input.alternativeText)
+				got, err := json.NewConfig(tt.input.toolName, tt.input.formatType, tt.input.customMessageFormat, tt.input.alternativeText)
 				assert.Nil(t, got)
 				assert.Error(t, err)
 			})

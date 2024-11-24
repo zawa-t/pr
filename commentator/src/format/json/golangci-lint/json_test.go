@@ -132,9 +132,9 @@ func Test_golangcilint_MakeContents_Decode(t *testing.T) {
 func Test_golangcilint_MakeContents(t *testing.T) {
 	t.Run("正常系", func(t *testing.T) {
 		type input struct {
-			alternativeText  *string
-			customTextFormat *string
-			issues           []golangcilint.Issue
+			alternativeText     *string
+			customMessageFormat *string
+			issues              []golangcilint.Issue
 		}
 		type testCase struct {
 			name     string
@@ -209,7 +209,7 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 			{
 				name: "正常系",
 				input: input{
-					customTextFormat: helper.ToPtr("customTextFormat"),
+					customMessageFormat: helper.ToPtr("customMessageFormat"),
 					issues: []golangcilint.Issue{
 						{
 							FromLinter:  "linter",
@@ -229,19 +229,19 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 				},
 				expected: []report.Content{
 					{
-						ID:        report.NewID("example.go", 10, report.CustomMessage("customTextFormat")),
+						ID:        report.NewID("example.go", 10, report.CustomMessage("customMessageFormat")),
 						Linter:    "linter",
 						FilePath:  "example.go",
 						LineNum:   10,
 						ColumnNum: 5,
-						Message:   report.CustomMessage("customTextFormat"),
+						Message:   report.CustomMessage("customMessageFormat"),
 					},
 				},
 			},
 			{
 				name: "正常系",
 				input: input{
-					customTextFormat: helper.ToPtr("{{.Pos.Filename}}"),
+					customMessageFormat: helper.ToPtr("{{.Pos.Filename}}"),
 					issues: []golangcilint.Issue{
 						{
 							FromLinter:  "linter",
@@ -271,10 +271,10 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 				},
 			},
 			{
-				name: "alternativeTextとcustomTextFormatが両方指定された場合",
+				name: "alternativeTextとcustomMessageFormatが両方指定された場合",
 				input: input{
-					alternativeText:  helper.ToPtr("alternativeText"),
-					customTextFormat: helper.ToPtr("{{.Pos.Filename}}"),
+					alternativeText:     helper.ToPtr("alternativeText"),
+					customMessageFormat: helper.ToPtr("{{.Pos.Filename}}"),
 					issues: []golangcilint.Issue{
 						{
 							FromLinter:  "linter",
@@ -307,7 +307,7 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				contents, err := golangcilint.MakeContents(tt.input.alternativeText, tt.input.customTextFormat, tt.input.issues)
+				contents, err := golangcilint.MakeContents(tt.input.alternativeText, tt.input.customMessageFormat, tt.input.issues)
 				if assert.NoError(t, err) {
 					assert.Equal(t, tt.expected, contents)
 				}
@@ -317,9 +317,9 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 
 	t.Run("異常系", func(t *testing.T) {
 		type input struct {
-			alternativeText  *string
-			customTextFormat *string
-			issues           []golangcilint.Issue
+			alternativeText     *string
+			customMessageFormat *string
+			issues              []golangcilint.Issue
 		}
 		type testCase struct {
 			name  string
@@ -328,9 +328,9 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 
 		tests := []testCase{
 			{
-				name: "指定されたcustomTextFormatに評価できないField名が指定された場合",
+				name: "指定されたcustomMessageFormatに評価できないField名が指定された場合",
 				input: input{
-					customTextFormat: helper.ToPtr("{{.Something}}"),
+					customMessageFormat: helper.ToPtr("{{.Something}}"),
 					issues: []golangcilint.Issue{
 						{
 							FromLinter:  "linter",
@@ -353,7 +353,7 @@ func Test_golangcilint_MakeContents(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				contents, err := golangcilint.MakeContents(tt.input.alternativeText, tt.input.customTextFormat, tt.input.issues)
+				contents, err := golangcilint.MakeContents(tt.input.alternativeText, tt.input.customMessageFormat, tt.input.issues)
 				assert.Nil(t, contents)
 				assert.Error(t, err)
 			})

@@ -40,12 +40,12 @@ func Decode(stdin io.Reader) (*JSON, error) {
 	return &jsonData, nil
 }
 
-func MakeContents(alternativeText, customTextFormat *string, issues []Issue) ([]report.Content, error) {
+func MakeContents(alternativeText, customMessageFormat *string, issues []Issue) ([]report.Content, error) {
 	contents := make([]report.Content, 0)
 	for _, v := range issues {
 		var message report.Message
-		if customTextFormat != nil {
-			tmpl, err := template.New("customTextFormat").Parse(*customTextFormat)
+		if customMessageFormat != nil {
+			tmpl, err := template.New("customMessageFormat").Parse(*customMessageFormat)
 			if err != nil {
 				return nil, fmt.Errorf("failed to Parse(): %w", err)
 			}

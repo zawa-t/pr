@@ -75,7 +75,7 @@ func newData(flagValue flag.Value, stdin io.Reader) report.Data {
 
 	switch flagValue.InputFormat {
 	case format.JSON:
-		config, err := json.NewConfig(flagValue.ToolName, flagValue.FormatType, flagValue.CustomTextFormat, flagValue.AlternativeText)
+		config, err := json.NewConfig(flagValue.ToolName, flagValue.FormatType, flagValue.CustomMessageFormat, flagValue.AlternativeText)
 		if err != nil {
 			slog.Error(err.Error())
 			os.Exit(1)
