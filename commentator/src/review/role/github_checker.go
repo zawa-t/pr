@@ -27,7 +27,7 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 		Status:     "completed",
 		Conclusion: "failure",
 		Output: github.CheckRunsOutput{
-			Title:   fmt.Sprintf("[%s] some issues were reported", input.Name),
+			Title:   fmt.Sprintf("[%s] report some issues", input.Name),
 			Summary: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
 			// Text: fmt.Sprintf("The total number of issues reported is %d.", len(input.Contents)),
 		},
@@ -37,12 +37,12 @@ func (g *githubChecker) Review(ctx context.Context, input review.Data) error {
 	for i, content := range input.Contents {
 		annotations[i] = github.Annotation{
 			AnnotationLevel: "warning",
+			Path:            content.FilePath,
+			StartLine:       int(content.LineNum),
+			EndLine:         int(content.LineNum),
 			Title:           fmt.Sprintf("reported by [%s]", content.Linter),
 			Message:         content.Message.String(),
 			// RawDetails:      "",
-			Path:      content.FilePath,
-			StartLine: int(content.LineNum),
-			EndLine:   int(content.LineNum),
 		}
 	}
 	postheckRuns.Output.Annotations = annotations
