@@ -8,7 +8,10 @@ import (
 
 type env string
 
-var Env env = env(os.Getenv("ENV"))
+var (
+	Env  env = env(os.Getenv("ENV"))
+	Lang     = os.Getenv("LANG")
+)
 
 func (e env) IsLocal() bool {
 	return e == "local"

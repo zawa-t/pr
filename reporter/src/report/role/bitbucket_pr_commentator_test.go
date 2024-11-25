@@ -3,6 +3,7 @@ package role
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zawa-t/pr/reporter/src/platform/bitbucket"
@@ -10,7 +11,7 @@ import (
 	"github.com/zawa-t/pr/reporter/src/test/custommock"
 )
 
-func Test_role_newCommentData(t *testing.T) {
+func Test_role_bitbucketPRCommentator_newCommentData(t *testing.T) {
 	type testCase struct {
 		name     string
 		input    report.Data
@@ -78,11 +79,142 @@ func Test_role_newCommentData(t *testing.T) {
 		},
 	}
 
+	bitbucketClientMock := custommock.DefaultBitbucketClientMock
+	bitbucketClientMock.GetCommentsFunc = func(ctx context.Context) ([]bitbucket.Comment, error) {
+		now := time.Now()
+		comments := []bitbucket.Comment{
+			{
+				ID:        1,
+				CreatedOn: now,
+				UpdatedOn: now,
+				Content: bitbucket.Content{
+					Type:   "",
+					Raw:    report.DefaultMessage("sample/main.go", 11, "golangci-lint", "sample text1").String(),
+					Markup: "",
+					HTML:   "",
+				},
+				User: struct {
+					Type        string "json:\"type\""
+					DisplayName string "json:\"display_name\""
+					UUID        string "json:\"uuid\""
+					AccountID   string "json:\"account_id\""
+					Nickname    string "json:\"nickname\""
+				}{
+					Type:        "",
+					DisplayName: "",
+					UUID:        "",
+					AccountID:   "",
+					Nickname:    "",
+				},
+				Deleted: false,
+				Inline: bitbucket.Inline{
+					Path: "sample/main.go",
+					From: 10,
+					To:   11,
+				},
+				Type: "",
+				PullRequest: struct {
+					Type  string "json:\"type\""
+					ID    int    "json:\"id\""
+					Title string "json:\"title\""
+				}{
+					Type:  "",
+					ID:    1,
+					Title: "",
+				},
+				Pending: false,
+			},
+			{
+				ID:        2,
+				CreatedOn: now,
+				UpdatedOn: now,
+				Content: bitbucket.Content{
+					Type:   "",
+					Raw:    report.DefaultMessage("sample/main.go", 16, "golangci-lint", "sample text2").String(),
+					Markup: "",
+					HTML:   "",
+				},
+				User: struct {
+					Type        string "json:\"type\""
+					DisplayName string "json:\"display_name\""
+					UUID        string "json:\"uuid\""
+					AccountID   string "json:\"account_id\""
+					Nickname    string "json:\"nickname\""
+				}{
+					Type:        "",
+					DisplayName: "",
+					UUID:        "",
+					AccountID:   "",
+					Nickname:    "",
+				},
+				Deleted: false,
+				Inline: bitbucket.Inline{
+					Path: "sample/main.go",
+					From: 15,
+					To:   16,
+				},
+				Type: "",
+				PullRequest: struct {
+					Type  string "json:\"type\""
+					ID    int    "json:\"id\""
+					Title string "json:\"title\""
+				}{
+					Type:  "",
+					ID:    1,
+					Title: "",
+				},
+				Pending: false,
+			},
+			{
+				ID:        3,
+				CreatedOn: now,
+				UpdatedOn: now,
+				Content: bitbucket.Content{
+					Type:   "",
+					Raw:    report.DefaultMessage("sample/main.go", 31, "golangci-lint", "sample text3").String(),
+					Markup: "",
+					HTML:   "",
+				},
+				User: struct {
+					Type        string "json:\"type\""
+					DisplayName string "json:\"display_name\""
+					UUID        string "json:\"uuid\""
+					AccountID   string "json:\"account_id\""
+					Nickname    string "json:\"nickname\""
+				}{
+					Type:        "",
+					DisplayName: "",
+					UUID:        "",
+					AccountID:   "",
+					Nickname:    "",
+				},
+				Deleted: true,
+				Inline: bitbucket.Inline{
+					Path: "sample/main.go",
+					From: 30,
+					To:   31,
+				},
+				Type: "",
+				PullRequest: struct {
+					Type  string "json:\"type\""
+					ID    int    "json:\"id\""
+					Title string "json:\"title\""
+				}{
+					Type:  "",
+					ID:    1,
+					Title: "",
+				},
+				Pending: false,
+			},
+		}
+		return comments, nil
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewBitbucketPRCommentator(custommock.DefaultBitbucketClientMock).newCommentData(context.Background(), tt.input)
+			got, err := NewBitbucketPRCommentator(bitbucketClientMock).newCommentData(context.Background(), tt.input)
 			if assert.NoError(t, err) {
-				assert.Equal(t, got, tt.expected)
+				assert.Equal(t, tt.expected, got)
 			}
 		})
 	}

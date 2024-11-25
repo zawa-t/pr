@@ -23,13 +23,31 @@ func NewGithubPRCommentator(c github.Client) *githubPRCommentator {
 
 // Report ...
 func (g *githubPRCommentator) Report(ctx context.Context, input report.Data) error {
+	comments, err := g.newCommentData(ctx, input)
+	if err != nil {
+		return fmt.Errorf("failed to newCommentData(): %w", err)
+	}
+
+	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
+	for _, comment := range comments {
+		if err := g.client.CreateComment(ctx, comment); err != nil {
+			multiErr = errors.Join(multiErr, err)
+		}
+	}
+	if multiErr != nil {
+		return multiErr
+	}
+	return nil
+}
+
+func (g *githubPRCommentator) newCommentData(ctx context.Context, input report.Data) ([]github.CommentData, error) {
 	if len(input.Contents) == 0 {
-		return fmt.Errorf("there is no data to comment")
+		return nil, fmt.Errorf("there is no data to comment")
 	}
 
 	existingComments, err := g.client.GetPRComments(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to exec r.GetPRComments(): %w", err)
+		return nil, fmt.Errorf("failed to GetPRComments(): %w", err)
 	}
 
 	existingCommentIDs := make([]report.ID, 0)
@@ -51,15 +69,5 @@ func (g *githubPRCommentator) Report(ctx context.Context, input report.Data) err
 			})
 		}
 	}
-
-	var multiErr error // MEMO: 一部の処理が失敗しても残りの処理を進めたいため、エラーはすべての処理がおわってからハンドリング
-	for _, comment := range comments {
-		if err := g.client.CreateComment(ctx, comment); err != nil {
-			multiErr = errors.Join(multiErr, err)
-		}
-	}
-	if multiErr != nil {
-		return multiErr
-	}
-	return nil
+	return comments, nil
 }

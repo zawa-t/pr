@@ -48,7 +48,8 @@ type Config struct {
 
 func NewConfig(toolName string, errorFormat, alternativeText *string) (*Config, error) {
 	if toolName == "" || errorFormat == nil || *errorFormat == "" {
-		return nil, fmt.Errorf("when using the text format, the values for toolName and errorFormat are required. toolName=%s, errorFormat=%v :%w", toolName, errorFormat, errors.ErrMissingRequiredParams)
+		err := fmt.Errorf("when using the text format, the values for toolName and errorFormat are required. toolName=%s, errorFormat=%v", toolName, errorFormat)
+		return nil, errors.NewAppError(errors.InvalidParams, err)
 	}
 	return &Config{
 		ToolName:        toolName,

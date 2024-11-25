@@ -8,6 +8,7 @@ import (
 
 	"github.com/zawa-t/pr/reporter/src/env"
 	"github.com/zawa-t/pr/reporter/src/errors"
+	"github.com/zawa-t/pr/reporter/src/platform"
 	"github.com/zawa-t/pr/reporter/src/platform/bitbucket"
 	"github.com/zawa-t/pr/reporter/src/platform/http"
 	"github.com/zawa-t/pr/reporter/src/platform/http/url"
@@ -46,7 +47,7 @@ func (c *Custom) GetComments(ctx context.Context) ([]bitbucket.Comment, error) {
 		if httpRes.StatusCode != 200 {
 			slog.Warn("Failed to retrieve comments.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
 			if httpRes.StatusCode == 404 {
-				return nil, errors.ErrNotFound
+				return nil, errors.NewAppError(errors.NotFound, platform.ErrNotFound)
 			}
 			return nil, fmt.Errorf("failed to retrieve comments")
 		}
@@ -147,7 +148,7 @@ func (c *Custom) GetReport(ctx context.Context, reportID string) (*bitbucket.Ann
 	if httpRes.StatusCode != 200 {
 		slog.Warn("Failed to retrieve report.", "res", fmt.Sprintf("%d: %s\n", httpRes.StatusCode, string(httpRes.Body)))
 		if httpRes.StatusCode == 404 {
-			return nil, errors.ErrNotFound
+			return nil, errors.NewAppError(errors.NotFound, platform.ErrNotFound)
 		}
 		return nil, fmt.Errorf("failed to retrieve report")
 	}

@@ -18,7 +18,8 @@ type Config struct {
 
 func NewConfig(toolName string, formatType *string, customMessageFormat, alternativeText *string) (*Config, error) {
 	if toolName == "" || formatType == nil || *formatType == "" {
-		return nil, fmt.Errorf("when using the json format, the values for toolName and formatType are required. toolName=%s, formatType=%v :%w", toolName, formatType, errors.ErrMissingRequiredParams)
+		err := fmt.Errorf("when using the json format, the values for toolName and formatType are required. toolName=%s, formatType=%v", toolName, formatType)
+		return nil, errors.NewAppError(errors.InvalidParams, err)
 	}
 	return &Config{
 		ToolName:            toolName,
