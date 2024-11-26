@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./commentator # appディレクトリをデフォルトの作業ディレクトリに設定
+        working-directory: ./src # appディレクトリをデフォルトの作業ディレクトリに設定
 
     steps:
       - name: Check out repository code
@@ -30,12 +30,28 @@ jobs:
         env:
           GOBIN: $(go env GOPATH)/bin
 
-      - name: Automatic Review
+      # - name: Automatic Review
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   uses: ./.github/workflows/pull-request
+      #   env:
+      #     REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install reviewdog
         if: ${{ github.event_name == 'pull_request' }}
-        uses: ./.github/workflows/pull-request
+        shell: bash
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run golangci-lint with reviewdog (GitHub Checks)
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        continue-on-error: true
         env:
-          REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ env.GITHUB_TOKEN }}
+        run: |
+          golangci-lint run ./... | \
+          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       - name: Build Test
         run: go build -v ./...
