@@ -51,11 +51,8 @@ jobs:
           golangci-lint run ./... | \
           reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
-      - name: Install dependencies
-        run: go mod tidy
-
       - name: Build Test
-        working-directory: ./cmd/reporter
+        working-directory: cmd/reporter
         run: go build -v
 
       - name: Unit Test
