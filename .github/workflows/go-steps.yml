@@ -9,9 +9,9 @@ jobs:
   go-steps:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./commentator # appディレクトリをデフォルトの作業ディレクトリに設定
+    # defaults:
+    #   run:
+    #     working-directory: src
 
     steps:
       - name: Check out repository code
@@ -30,15 +30,46 @@ jobs:
         env:
           GOBIN: $(go env GOPATH)/bin
 
-      - name: Automatic Review
+      # - name: Automatic Review
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   uses: ./.github/workflows/pull-request
+      #   env:
+      #     REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install reviewdog
         if: ${{ github.event_name == 'pull_request' }}
-        uses: ./.github/workflows/pull-request
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run golangci-lint with reviewdog (GitHub Checks) for cmd/reporter
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: src/cmd/reporter
+        continue-on-error: true
         env:
-          REVIEWDOG_PAT: ${{ secrets.REVIEWDOG_PAT }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          golangci-lint run ./... | \
+          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
-      - name: Build Test
-        run: go build -v ./...
+      - name: Build Test for cmd/reporter
+        working-directory: src/cmd/reporter
+        run: go build -v
 
-      - name: Unit Test
+      - name: Unit Test for cmd/reporter
+        working-directory: src/cmd/reporter
+        run: go test -v ./...
+
+      - name: Run golangci-lint with reviewdog (GitHub Checks) for reporter
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: src/reporter
+        continue-on-error: true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          golangci-lint run ./... | \
+          reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
+
+      - name: Unit Test for reporter
+        working-directory: src/reporter
         run: go test -v ./...
