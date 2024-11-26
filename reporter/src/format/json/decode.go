@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/zawa-t/pr/reporter/src/errors"
 	golangcilint "github.com/zawa-t/pr/reporter/src/format/json/golangci-lint"
 	"github.com/zawa-t/pr/reporter/src/report"
 )
@@ -18,8 +17,7 @@ type Config struct {
 
 func NewConfig(toolName string, formatType *string, customMessageFormat, alternativeText *string) (*Config, error) {
 	if toolName == "" || formatType == nil || *formatType == "" {
-		err := fmt.Errorf("when using the json format, the values for toolName and formatType are required. toolName=%s, formatType=%v", toolName, formatType)
-		return nil, errors.NewAppError(errors.InvalidParams, err)
+		return nil, fmt.Errorf("when using the json format, the values for toolName and formatType are required. toolName=%s, formatType=%v", toolName, formatType)
 	}
 	return &Config{
 		ToolName:            toolName,

@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zawa-t/pr/reporter/src/errors"
 	"github.com/zawa-t/pr/reporter/src/report"
 )
 
@@ -47,8 +46,7 @@ type Config struct {
 
 func NewConfig(toolName string, errorFormat, alternativeText *string) (*Config, error) {
 	if toolName == "" || errorFormat == nil || *errorFormat == "" {
-		err := fmt.Errorf("when using the text format, the values for toolName and errorFormat are required. toolName=%s, errorFormat=%v", toolName, errorFormat)
-		return nil, errors.NewAppError(errors.InvalidParams, err)
+		return nil, fmt.Errorf("when using the text format, the values for toolName and errorFormat are required. toolName=%s, errorFormat=%v", toolName, errorFormat)
 	}
 	return &Config{
 		ToolName:        toolName,
