@@ -9,9 +9,9 @@ jobs:
   go-steps:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: src
+    # defaults:
+    #   run:
+    #     working-directory: src
 
     steps:
       - name: Check out repository code
@@ -44,6 +44,7 @@ jobs:
 
       - name: Run golangci-lint with reviewdog (GitHub Checks)
         if: ${{ github.event_name == 'pull_request' }}
+        working-directory: src
         continue-on-error: true
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,4 +57,5 @@ jobs:
         run: go build -v
 
       - name: Unit Test
+        working-directory: src
         run: go test -v ./...
