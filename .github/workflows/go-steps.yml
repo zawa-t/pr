@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./src
+        working-directory: src
 
     steps:
       - name: Check out repository code
@@ -52,7 +52,7 @@ jobs:
           reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       - name: Build Test
-        working-directory: cmd/reporter
+        working-directory: src/cmd/reporter
         run: go build -v
 
       - name: Unit Test
