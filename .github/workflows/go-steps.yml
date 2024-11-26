@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./src # appディレクトリをデフォルトの作業ディレクトリに設定
+        working-directory: ./src
 
     steps:
       - name: Check out repository code
@@ -54,7 +54,7 @@ jobs:
           reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-check
 
       - name: Build Test
-        run: go build -v ./...
+        run: go build -v ./cmd/reporter
 
       - name: Unit Test
         run: go test -v ./...
