@@ -27,8 +27,7 @@ func (e *efm) convertToRegex() (*regexp.Regexp, error) {
 
 	regexPattern := string(*e)
 	for _, splitedEFM := range strings.Split(regexPattern, ":") {
-		_, ok := efmPatterns[strings.TrimSpace(splitedEFM)]
-		if !ok {
+		if _, ok := efmPatterns[strings.TrimSpace(splitedEFM)]; !ok {
 			return nil, stdErr.New("unsuported errorformat is specified")
 		}
 	}

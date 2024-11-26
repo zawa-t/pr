@@ -108,8 +108,7 @@ func (f *useableFlag) validate() {
 		}
 	}
 
-	_, ok := role.NameList[f.roleName]
-	if !ok {
+	if _, ok := role.NameList[f.roleName]; !ok {
 		useableRoleNames := make([]string, 0, len(role.NameList))
 		for roleName := range role.NameList {
 			useableRoleNames = append(useableRoleNames, roleName)
