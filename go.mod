@@ -1,4 +1,4 @@
-module github.com/zawa-t/pr/src
+module github.com/zawa-t/pr
 
 go 1.22.8
 
