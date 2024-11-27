@@ -3,10 +3,10 @@ package role
 import (
 	"context"
 
-	"github.com/zawa-t/pr/reporter/platform/github"
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/platform/github"
+	"github.com/zawa-t/pr/src/report"
 
-	"github.com/zawa-t/pr/reporter/log"
+	"github.com/zawa-t/pr/src/log"
 )
 
 // githubPRReviewer ...

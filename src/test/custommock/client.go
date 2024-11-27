@@ -3,8 +3,8 @@ package custommock
 import (
 	"context"
 
-	"github.com/zawa-t/pr/reporter/platform/http"
-	"github.com/zawa-t/pr/reporter/test/mock"
+	"github.com/zawa-t/pr/src/platform/http"
+	"github.com/zawa-t/pr/src/test/mock"
 )
 
 var Client = func(statusCode int, cookies http.Cookies, body []byte) *mock.ClientMock {

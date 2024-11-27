@@ -6,8 +6,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/zawa-t/pr/reporter/format"
-	"github.com/zawa-t/pr/reporter/report/role"
+	"github.com/zawa-t/pr/src/format"
+	"github.com/zawa-t/pr/src/report/role"
 )
 
 var usage = `

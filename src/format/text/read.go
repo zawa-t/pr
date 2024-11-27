@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/report"
 )
 
 type efm string

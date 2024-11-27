@@ -3,8 +3,8 @@ package role
 import (
 	"context"
 
-	"github.com/zawa-t/pr/reporter/log"
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/log"
+	"github.com/zawa-t/pr/src/report"
 )
 
 // localCommentator ...

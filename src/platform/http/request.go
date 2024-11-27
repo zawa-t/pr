@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/zawa-t/pr/reporter/platform/http/url"
+	"github.com/zawa-t/pr/src/platform/http/url"
 )
 
 // Request ...

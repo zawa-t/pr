@@ -8,12 +8,12 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/zawa-t/pr/reporter/dependency"
-	"github.com/zawa-t/pr/reporter/flag"
-	"github.com/zawa-t/pr/reporter/format"
-	"github.com/zawa-t/pr/reporter/format/json"
-	"github.com/zawa-t/pr/reporter/format/text"
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/dependency"
+	"github.com/zawa-t/pr/src/flag"
+	"github.com/zawa-t/pr/src/format"
+	"github.com/zawa-t/pr/src/format/json"
+	"github.com/zawa-t/pr/src/format/text"
+	"github.com/zawa-t/pr/src/report"
 )
 
 /*

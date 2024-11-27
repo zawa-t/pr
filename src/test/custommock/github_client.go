@@ -3,9 +3,9 @@ package custommock
 import (
 	"context"
 
-	"github.com/zawa-t/pr/reporter/platform/github"
+	"github.com/zawa-t/pr/src/platform/github"
 
-	mock "github.com/zawa-t/pr/reporter/test/mock/github"
+	mock "github.com/zawa-t/pr/src/test/mock/github"
 )
 
 var DefaultGithubClientMock = &mock.ClientMock{

@@ -3,9 +3,9 @@ package custommock
 import (
 	"context"
 
-	"github.com/zawa-t/pr/reporter/platform/bitbucket"
+	"github.com/zawa-t/pr/src/platform/bitbucket"
 
-	mock "github.com/zawa-t/pr/reporter/test/mock/bitbucket"
+	mock "github.com/zawa-t/pr/src/test/mock/bitbucket"
 )
 
 var DefaultBitbucketClientMock = &mock.ClientMock{

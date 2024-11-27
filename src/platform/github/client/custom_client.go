@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/zawa-t/pr/reporter/platform/github"
-	"github.com/zawa-t/pr/reporter/platform/http"
-	"github.com/zawa-t/pr/reporter/platform/http/url"
+	"github.com/zawa-t/pr/src/platform/github"
+	"github.com/zawa-t/pr/src/platform/http"
+	"github.com/zawa-t/pr/src/platform/http/url"
 
-	"github.com/zawa-t/pr/reporter/env"
+	"github.com/zawa-t/pr/src/env"
 )
 
 // Custom provides client for HTTP request.

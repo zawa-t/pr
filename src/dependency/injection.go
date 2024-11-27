@@ -4,14 +4,14 @@ import (
 	"log/slog"
 	"os"
 
-	bitbucketClient "github.com/zawa-t/pr/reporter/platform/bitbucket/client"
+	bitbucketClient "github.com/zawa-t/pr/src/platform/bitbucket/client"
 
-	githubClient "github.com/zawa-t/pr/reporter/platform/github/client"
+	githubClient "github.com/zawa-t/pr/src/platform/github/client"
 
-	"github.com/zawa-t/pr/reporter/report"
-	"github.com/zawa-t/pr/reporter/report/role"
+	"github.com/zawa-t/pr/src/report"
+	"github.com/zawa-t/pr/src/report/role"
 
-	"github.com/zawa-t/pr/reporter/platform/http"
+	"github.com/zawa-t/pr/src/platform/http"
 )
 
 func NewReporter(roleNum int) (reporter report.Reporter) {

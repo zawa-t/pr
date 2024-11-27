@@ -3,9 +3,9 @@ package client
 import (
 	"fmt"
 
-	"github.com/zawa-t/pr/reporter/platform/http/url"
+	"github.com/zawa-t/pr/src/platform/http/url"
 
-	"github.com/zawa-t/pr/reporter/env"
+	"github.com/zawa-t/pr/src/env"
 )
 
 var baseURL = fmt.Sprintf("https://api.github.com/repos/%s", env.Github.RepositoryName)

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zawa-t/pr/reporter/format/json"
-	"github.com/zawa-t/pr/reporter/test/helper"
+	"github.com/zawa-t/pr/src/format/json"
+	"github.com/zawa-t/pr/src/test/helper"
 )
 
 func Test_json_NewConfig(t *testing.T) {

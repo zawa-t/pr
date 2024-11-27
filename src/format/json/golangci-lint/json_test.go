@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	golangcilint "github.com/zawa-t/pr/reporter/format/json/golangci-lint"
+	golangcilint "github.com/zawa-t/pr/src/format/json/golangci-lint"
 
-	"github.com/zawa-t/pr/reporter/report"
-	"github.com/zawa-t/pr/reporter/test/helper"
+	"github.com/zawa-t/pr/src/report"
+	"github.com/zawa-t/pr/src/test/helper"
 )
 
 func Test_golangcilint_MakeContents_Decode(t *testing.T) {

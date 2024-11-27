@@ -1,4 +1,4 @@
-//go:generate moq -rm -out $GOPATH/src/reporter/reporter/test/mock/$GOFILE -pkg mock . Reporter
+//go:generate moq -rm -out $GOPATH/app/src/test/mock/$GOFILE -pkg mock . Reporter
 package report
 
 import (

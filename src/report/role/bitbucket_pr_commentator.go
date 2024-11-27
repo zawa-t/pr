@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/zawa-t/pr/reporter/platform/bitbucket"
+	"github.com/zawa-t/pr/src/platform/bitbucket"
 
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/report"
 )
 
 // bitbucketPRCommentator ...

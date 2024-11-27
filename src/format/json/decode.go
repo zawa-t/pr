@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	golangcilint "github.com/zawa-t/pr/reporter/format/json/golangci-lint"
-	"github.com/zawa-t/pr/reporter/report"
+	golangcilint "github.com/zawa-t/pr/src/format/json/golangci-lint"
+	"github.com/zawa-t/pr/src/report"
 )
 
 type Config struct {

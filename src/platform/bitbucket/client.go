@@ -1,4 +1,4 @@
-//go:generate moq -rm -out $GOPATH/src/reporter/test/mock/bitbucket/$GOFILE -pkg mock . Client
+//go:generate moq -rm -out $GOPATH/app/src/test/mock/bitbucket/$GOFILE -pkg mock . Client
 package bitbucket
 
 import (

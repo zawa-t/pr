@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zawa-t/pr/reporter/platform/bitbucket"
-	"github.com/zawa-t/pr/reporter/report"
-	"github.com/zawa-t/pr/reporter/test/custommock"
+	"github.com/zawa-t/pr/src/platform/bitbucket"
+	"github.com/zawa-t/pr/src/report"
+	"github.com/zawa-t/pr/src/test/custommock"
 
 	"github.com/stretchr/testify/assert"
 )

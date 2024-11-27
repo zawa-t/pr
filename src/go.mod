@@ -1,4 +1,4 @@
-module github.com/zawa-t/pr/reporter
+module github.com/zawa-t/pr/src
 
 go 1.22.8
 

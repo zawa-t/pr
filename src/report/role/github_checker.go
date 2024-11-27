@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zawa-t/pr/reporter/env"
-	"github.com/zawa-t/pr/reporter/platform/github"
-	"github.com/zawa-t/pr/reporter/report"
+	"github.com/zawa-t/pr/src/env"
+	"github.com/zawa-t/pr/src/platform/github"
+	"github.com/zawa-t/pr/src/report"
 )
 
 // githubChecker ...

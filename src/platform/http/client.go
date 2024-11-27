@@ -1,4 +1,4 @@
-//go:generate moq -rm -out $GOPATH/src/reporter/test/mock/$GOFILE -pkg mock . Client
+//go:generate moq -rm -out $GOPATH/app/src/test/mock/$GOFILE -pkg mock . Client
 package http
 
 import (

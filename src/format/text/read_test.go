@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/zawa-t/pr/reporter/format/text"
-	"github.com/zawa-t/pr/reporter/report"
-	"github.com/zawa-t/pr/reporter/test/helper"
+	"github.com/zawa-t/pr/src/format/text"
+	"github.com/zawa-t/pr/src/report"
+	"github.com/zawa-t/pr/src/test/helper"
 
 	"github.com/stretchr/testify/assert"
 )
