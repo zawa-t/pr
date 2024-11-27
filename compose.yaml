@@ -6,8 +6,8 @@ services:
     image: reporter-img
     container_name: reporter
     volumes:
-      - ./src:/go/src
+      - .:/go/app
     env_file:
-      - ./src/.env
+      - ./.env
     tty: true
     stdin_open: true
