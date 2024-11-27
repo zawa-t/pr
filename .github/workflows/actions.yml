@@ -6,10 +6,12 @@ run-name: Github Actions for Go
 on:
   push:
     paths:
+      - 'cmd/**'
       - 'src/**'
     branches: [ "main" ]
   pull_request:
     paths:
+      - 'cmd/**'
       - 'src/**'
     branches: [ "main" ]
 

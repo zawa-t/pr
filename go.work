@@ -2,5 +2,5 @@ go 1.22.8
 
 use (
 	./cmd/reporter
-	./reporter
+	./src
 )
