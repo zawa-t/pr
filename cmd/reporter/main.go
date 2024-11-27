@@ -31,7 +31,6 @@ $ ./reporter -n=golangci-lint -efm="%f:%l:%c: %m" -r=local-comment < sample/gola
 
 /*
 TODO:
-・Exitの使用箇所を限定する
 ・-vオプションでのバージョン表示
 ・github-pr-checkとgithub-checkの整備
 ・出力されるログおよびログレベルの整理（slog でカスタムの JSON フォーマッタを作成含む） ※出力されるエラーの整理も
